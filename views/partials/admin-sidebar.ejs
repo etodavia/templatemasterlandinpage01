@@ -73,13 +73,7 @@
                     <i class="ri-layout-masonry-fill"></i> <span class="nav-text">Editor Global</span>
                 </a>
             </li>
-            <% if (locals.userRole === 'superadmin') { %>
-            <li>
-                <a href="/admin/conteudo?tab=licenciamento" style="color: var(--accent); opacity: 0.8;">
-                    <i class="ri-shield-check-fill"></i> <span class="nav-text">Licenciamento (Elite)</span>
-                </a>
-            </li>
-            <% } %>
+
             <li>
                 <a href="/admin/posts" class="<%= (locals.title.includes('Blog')) ? 'active' : '' %>">
                     <i class="ri-article-fill"></i> <span class="nav-text">Blog</span>
