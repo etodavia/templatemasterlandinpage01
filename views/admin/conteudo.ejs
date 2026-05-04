@@ -104,7 +104,9 @@
             </nav>
 
             <form id="cmsForm" action="/admin/conteudo" method="POST" class="cms-content" enctype="multipart/form-data">
-                <%- include('../partials/admin-alerts') %>
+                <div style="max-width: 900px; margin: 0 auto;">
+                    <%- include('../partials/admin-alerts') %>
+                </div>
                 
                 <!-- IDENTIDADE & CORES -->
                 <div id="tab-identidade" class="tab-panel <%= (locals.userRole !== 'superadmin') ? 'active' : '' %>">
@@ -587,7 +589,7 @@ Contato|/contato"><%= settings.site_menu %></textarea>
                 </div>
                 <!-- LICENCIAMENTO & AUTENTICAÇÃO (APENAS SUPERADMIN) -->
                 <% if (locals.userRole === 'superadmin') { %>
-                <div id="tab-licenciamento" class="tab-panel">
+                <div id="tab-licenciamento" class="tab-panel <%= (locals.userRole === 'superadmin') ? 'active' : '' %>">
                     <div class="section-header">
                         <h2 style="color: var(--accent); font-weight: 900; margin-bottom: 20px;">[SISTEMA DE SOBERANIA ATIVO]</h2>
                         <h3>Soberania & Autenticação do Ecossistema</h3>
