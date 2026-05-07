@@ -363,6 +363,28 @@ app.get('/servicos/:slug', async (req, res) => {
     } catch (e) { res.redirect('/servicos'); }
 });
 
+// ROTA PÚBLICA PARA COLETAR DEPOIMENTOS
+app.get('/colher-depoimento', (req, res) => {
+    res.render('public-form-depoimento', { title: 'Compartilhe sua Experiência' });
+});
+
+app.post('/api/public-depoimento', upload.single('foto_file'), async (req, res) => {
+    const { nome, cargo, empresa, texto } = req.body;
+    let foto = '/img/placeholder-user.png';
+    if (req.file) foto = `/uploads/${req.file.filename}`;
+    
+    try {
+        await pool.execute(
+            'INSERT INTO depoimentos (nome, cargo, empresa, texto, foto, aprovado) VALUES (?, ?, ?, ?, ?, ?)',
+            [nome, cargo, empresa, texto, foto, 0] // 0 = Pendente
+        );
+        res.status(200).json({ success: true });
+    } catch (err) {
+        console.error('❌ PUBLIC TESTIMONIAL ERROR:', err);
+        res.status(500).json({ error: 'Erro ao salvar depoimento' });
+    }
+});
+
 app.get('/blog', async (req, res) => {
     try {
         const [posts] = await pool.execute('SELECT * FROM posts WHERE ativo = 1 ORDER BY created_at DESC');

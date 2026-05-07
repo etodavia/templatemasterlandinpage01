@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compartilhe sua Experiência | ARQUÊ GESTÃO</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            background: #f8fafc; 
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .capture-card {
+            background: white;
+            width: 100%;
+            max-width: 600px;
+            padding: 50px;
+            border-radius: 40px;
+            box-shadow: 0 40px 100px rgba(10, 17, 40, 0.08);
+            text-align: center;
+        }
+        .logo-box { margin-bottom: 30px; }
+        .logo-box img { height: 40px; }
+        
+        h1 { font-size: 2.2rem; color: #0A1128; font-weight: 900; line-height: 1.1; margin-bottom: 15px; }
+        h1 em { color: #D62828; font-style: normal; }
+        p.lead { color: #64748B; font-size: 1rem; margin-bottom: 40px; }
+
+        .form-group { text-align: left; margin-bottom: 25px; }
+        label { display: block; font-weight: 800; font-size: 0.75rem; color: #0A1128; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; }
+        input, textarea {
+            width: 100%;
+            padding: 18px;
+            border: 1px solid #e2e8f0;
+            border-radius: 15px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: 0.3s;
+            background: #fcfdfe;
+        }
+        input:focus, textarea:focus { outline: none; border-color: #0A1128; box-shadow: 0 0 0 4px rgba(10, 17, 40, 0.05); }
+
+        .photo-upload {
+            border: 2px dashed #e2e8f0;
+            padding: 30px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-bottom: 30px;
+        }
+        .photo-upload:hover { border-color: #0A1128; background: #f8fafc; }
+        .photo-upload i { font-size: 2rem; color: #cbd5e1; }
+        
+        .btn-submit {
+            width: 100%;
+            background: #0A1128;
+            color: white;
+            border: none;
+            padding: 20px;
+            border-radius: 50px;
+            font-weight: 900;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 10px 25px rgba(10, 17, 40, 0.2);
+        }
+        .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(10, 17, 40, 0.3); }
+
+        .success-overlay {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .success-overlay i { font-size: 4rem; color: #16a34a; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="capture-card" id="mainCard">
+        <div id="formContent">
+            <div class="logo-box">
+                <img src="/img/logo-agencia.png" alt="ARQUÊ GESTÃO">
+            </div>
+            <h1>Sua voz molda nossa <em>excelência</em>.</h1>
+            <p class="lead">Compartilhe como foi sua experiência com as soluções estratégicas da ARQUÊΔ.</p>
+
+            <form id="depoimentoForm" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>Seu Nome Completo</label>
+                    <input type="text" name="nome" placeholder="Ex: Ricardo Silva" required>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group">
+                        <label>Seu Cargo</label>
+                        <input type="text" name="cargo" placeholder="Ex: Diretor de RH" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Sua Empresa</label>
+                        <input type="text" name="empresa" placeholder="Ex: Tech Corp" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Seu Relato / Depoimento</label>
+                    <textarea name="texto" placeholder="Fale um pouco sobre os resultados alcançados..." rows="5" required></textarea>
+                </div>
+
+                <div class="photo-upload" onclick="document.getElementById('fileInput').click()">
+                    <div id="uploadPreview">
+                        <i class="ri-camera-lens-line"></i>
+                        <p style="font-size: 0.8rem; color: #64748B; margin-top: 10px;">Clique para enviar sua foto (opcional)</p>
+                    </div>
+                    <input type="file" name="foto_file" id="fileInput" accept="image/*" style="display: none;">
+                </div>
+
+                <button type="submit" class="btn-submit">ENVIAR DEPOIMENTO</button>
+            </form>
+        </div>
+
+        <div class="success-overlay" id="successBox">
+            <i class="ri-checkbox-circle-fill"></i>
+            <h2 style="font-size: 2rem; color: #0A1128; margin: 0 0 10px;">Relato Recebido!</h2>
+            <p style="color: #64748B;">Obrigado por contribuir com a jornada da ARQUÊ GESTÃO. Sua mensagem será enviada para nossa equipe de moderação.</p>
+            <a href="/" style="margin-top: 30px; text-decoration: none; color: #0A1128; font-weight: 800; font-size: 0.9rem;">Voltar ao Site</a>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        fileInput.onchange = evt => {
+            const [file] = fileInput.files;
+            if (file) {
+                document.getElementById('uploadPreview').innerHTML = `
+                    <img src="${URL.createObjectURL(file)}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #0A1128;">
+                    <p style="font-size: 0.7rem; color: #16a34a; font-weight: 800; margin-top: 10px;">FOTO SELECIONADA</p>
+                `;
+            }
+        };
+
+        const form = document.getElementById('depoimentoForm');
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const btn = form.querySelector('button');
+            btn.disabled = true;
+            btn.innerText = 'ENVIANDO...';
+
+            try {
+                const response = await fetch('/api/public-depoimento', {
+                    method: 'POST',
+                    body: formData
+                });
+                if (response.ok) {
+                    document.getElementById('formContent').style.display = 'none';
+                    document.getElementById('successBox').style.display = 'flex';
+                } else {
+                    alert('Erro ao enviar depoimento. Tente novamente.');
+                    btn.disabled = false;
+                    btn.innerText = 'ENVIAR DEPOIMENTO';
+                }
+            } catch (err) {
+                alert('Erro na conexão. Verifique sua internet.');
+                btn.disabled = false;
+                btn.innerText = 'ENVIAR DEPOIMENTO';
+            }
+        };
+    </script>
+</body>
+</html>
