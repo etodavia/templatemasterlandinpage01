@@ -8,7 +8,7 @@
                 <% if (settings.admin_header_logo) { %>
                     <img src="<%= settings.admin_header_logo %>" alt="Logo" style="max-height: 35px; object-fit: contain;">
                 <% } else { %>
-                    <span style="background: var(--admin-accent); color: white; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 1rem;"><i class="ri-pulse-fill"></i></span> <%= settings.site_name ? settings.site_name.split(' ')[0] : 'ARQUÊ' %>Δ
+                    <%= settings.site_name ? settings.site_name.split(' ')[0] : 'ARQUÊ' %>Δ
                 <% } %>
                 <span class="desktop-only" style="opacity: 0.3; font-weight: 400; font-size: 0.7rem; letter-spacing: 1px;">COCKPIT 360°</span>
             </h1>
