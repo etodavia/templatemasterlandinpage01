@@ -320,11 +320,9 @@ app.get('/', async (req, res) => {
     let services = [];
     let team = [];
     let testimonials = [];
-    let diferenciais = [];
 
     try {
-        // Consultar Diferenciais (Nova Tabela)
-        [diferenciais] = await pool.execute('SELECT * FROM diferenciais ORDER BY ordem ASC, created_at ASC');
+
         // Consultar Posts (com fallback)
         try {
             [posts] = await pool.execute('SELECT * FROM posts WHERE destaque_home = 1 AND ativo = 1 ORDER BY ordem ASC, created_at DESC LIMIT 4');
@@ -359,8 +357,7 @@ app.get('/', async (req, res) => {
             posts,
             services,
             team,
-            testimonials,
-            diferenciais
+            testimonials
         });
     } catch (e) { 
         console.error('❌ CRITICAL HOME ROUTE ERROR:', e);
@@ -446,15 +443,13 @@ app.get('/blog/:slug', async (req, res) => {
 // CMS ADMIN ROUTES
 app.get('/admin/conteudo', async (req, res) => {
     try {
-        const [diferenciais] = await pool.execute('SELECT * FROM diferenciais ORDER BY ordem ASC, created_at ASC');
         res.render('admin/conteudo', { 
             title: 'Editor Global (CMS)', 
             success: req.query.success,
-            activeTab: req.query.tab || '',
-            diferenciais
+            activeTab: req.query.tab || ''
         });
     } catch (e) {
-        res.render('admin/conteudo', { title: 'Editor Global (CMS)', diferenciais: [] });
+        res.render('admin/conteudo', { title: 'Editor Global (CMS)' });
     }
 });
 app.post('/admin/conteudo', upload.fields([
@@ -481,7 +476,7 @@ app.post('/admin/conteudo', upload.fields([
         'instagram_url', 'linkedin_url', 'facebook_url', 'nav_cta_text', 'endereco', 'whatsapp',
         'color_marinho', 'color_areia', 'color_vermelho', 'color_texto', 'color_header', 'color_footer',
         'color_header_text', 'color_footer_text', 'hero_image', 'about_title', 'about_text', 'about_image',
-        'benefits_title', 'benefits_text', 'about_story_text_left', 'about_story_text_right',
+        'about_story_text_left', 'about_story_text_right',
         'about_mission', 'about_vision', 'about_values', 'about_team_title', 'about_team_text',
         'about_hero_title', 'about_hero_image', 'services_hero_image', 'blog_hero_title', 'blog_hero_image',
         'contact_hero_title', 'contact_hero_image', 'cnpj', 'logo', 'logo_white', 'favicon', 'show_topbar',
@@ -491,7 +486,7 @@ app.post('/admin/conteudo', upload.fields([
         'blog_page_newsletter_text', 'contact_page_description', 'site_menu', 'home_hero_card_title',
         'home_hero_card_subtitle', 'home_about_button_text', 'home_services_button_text', 'about_story_image',
         'about_story_lead', 'about_guidelines_title', 'about_guidelines_text',
-        'social_links', 'benefits_items', 'benefits_template', 'benefits_color', 'hero_overlay_color',
+        'social_links', 'hero_overlay_color',
         'hero_overlay_opacity', 'contact_phone', 'contact_email', 'address_full', 'contact_map_url',
         'contact_form_title', 'contact_form_recipient', 'license_qr_code', 'license_nf_data',
         'license_pdf', 'license_auth_code', 'admin_primary_color', 'admin_accent_color', 'admin_logo', 'admin_header_logo', 'contact_form_fields'
@@ -530,20 +525,7 @@ app.post('/admin/conteudo', upload.fields([
     try {
         await pool.execute(`UPDATE configuracoes_globais SET ${sets} WHERE id = 1`, values);
         
-        // Sincronizar nova tabela de Diferenciais se houver dados
-        if (req.body.benefits_items) {
-            try {
-                const items = JSON.parse(req.body.benefits_items);
-                // Limpar atuais e reinserir (método mais simples e seguro para este volume de dados)
-                await pool.execute('DELETE FROM diferenciais');
-                for (const item of items) {
-                    if (item.title || item.text) {
-                        await pool.execute('INSERT INTO diferenciais (titulo, texto, icone) VALUES (?, ?, ?)', 
-                            [item.title, item.text, item.icon || 'ri-star-line']);
-                    }
-                }
-            } catch (err) { console.error('❌ ERROR SYNCING DIFERENCIAIS TABLE:', err); }
-        }
+
 
         const activeTab = req.body.active_tab || '';
         res.redirect(`/admin/conteudo?success=1${activeTab ? '&tab=' + activeTab : ''}`);

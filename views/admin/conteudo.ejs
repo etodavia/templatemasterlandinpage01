@@ -92,7 +92,7 @@
                 <div class="tab-link" onclick="switchTab('tab-home-hero')"><i class="ri-flashlight-line"></i> <span>Hero</span></div>
                 <div class="tab-link" onclick="switchTab('tab-home-sobre')"><i class="ri-user-3-line"></i> <span>Sobre</span></div>
                 <div class="tab-link" onclick="switchTab('tab-home-servicos')"><i class="ri-service-line"></i> <span>Serviços</span></div>
-                <div class="tab-link" onclick="switchTab('tab-home-diferenciais')"><i class="ri-medal-line"></i> <span>Diferenciais</span></div>
+
                 <div class="tab-link" onclick="switchTab('tab-home-artigos')"><i class="ri-article-line"></i> <span>Artigos</span></div>
                 <div class="tab-link" onclick="switchTab('tab-home-depoimentos')"><i class="ri-chat-quote-line"></i> <span>Depoimentos</span></div>
                 <div class="tab-link" onclick="switchTab('tab-home-newsletter')"><i class="ri-mail-send-line"></i> <span>Newsletter</span></div>
@@ -454,91 +454,6 @@ Contato|/contato"><%= settings.site_menu %></textarea>
                     </div>
                 </div>
 
-                <!-- HOME: DIFERENCIAIS -->
-                <div id="tab-home-diferenciais" class="tab-panel">
-                    <div class="section-header"><h3>Home Page » Seção Diferenciais & Estratégia</h3></div>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>Título Base (Impacto)</label>
-                            <input type="text" name="benefits_title" value="<%= settings.benefits_title %>">
-                            <p class="field-note"><i class="ri-information-line"></i> Use &lt;em&gt;texto&lt;/em&gt; para aplicar a fonte alternada.</p>
-                        </div>
-                        <div class="form-group" style="display: flex; flex-direction: column; gap: 10px;">
-                            <label>Estilo Visual (Templates Iconbox)</label>
-                            <select name="benefits_template" style="padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; width: 100%; font-weight: 700; color: var(--primary);">
-                                <option value="style-glass" <%= settings.benefits_template === 'style-glass' ? 'selected' : '' %>>Glassmorphism (Premium)</option>
-                                <option value="style-industrial" <%= settings.benefits_template === 'style-industrial' ? 'selected' : '' %>>Industrial Solid (Power)</option>
-                                <option value="style-clean" <%= settings.benefits_template === 'style-clean' ? 'selected' : '' %>>Minimalist Accent (Focus)</option>
-                                <option value="style-navy" <%= settings.benefits_template === 'style-navy' ? 'selected' : '' %>>Dark Mode (Authority)</option>
-                            </select>
-                        </div>
-                        <div class="form-group" style="display: flex; flex-direction: column; gap: 10px;">
-                            <label>Cromatismo de Acento (Cor Custom)</label>
-                            <input type="color" name="benefits_color" value="<%= settings.benefits_color || '#FA641E' %>" style="width: 100%; height: 45px; padding: 5px; border-radius: 12px; border: 1px solid #E2E8F0; cursor: pointer;">
-                        </div>
-                        <div class="form-group full">
-                            <label>Conteúdo Narrativo / Posicionamento</label>
-                            <textarea name="benefits_text" style="height: 100px;"><%= settings.benefits_text %></textarea>
-                        </div>
-                    </div>
-
-                    <!-- Hub de Diferenciais -->
-                    <div style="margin-top: 50px;">
-                        <h4 style="font-size: 0.85rem; font-weight: 900; color: var(--primary); text-transform: uppercase; margin-bottom: 5px; border-bottom: 2px solid #F1F5F9; padding-bottom: 15px;">
-                            <i class="ri-grid-line" style="color: var(--accent);"></i> Arquitetura de Diferenciais (Hub de Valor)
-                        </h4>
-                        <p class="field-note" style="margin-bottom: 25px;">
-                            <i class="ri-information-line"></i> Use as classes do <strong>Remix Icon</strong> (ex: <code>ri-focus-2-line</code>). 
-                            <a href="https://remixicon.com/" target="_blank" style="color: var(--accent); font-weight: 800; text-decoration: underline;">Clique aqui para ver a lista completa de ícones</a>.
-                        </p>
-                        
-                        <% 
-                            let bItems = [];
-                            if (locals.diferenciais && diferenciais.length > 0) {
-                                bItems = diferenciais.map(d => ({ icon: d.icone, title: d.titulo, text: d.texto }));
-                            } else {
-                                try { bItems = JSON.parse(settings.benefits_items || '[]'); } catch(e) { bItems = []; }
-                            }
-                            while(bItems.length < 4) bItems.push({ icon: '', title: '', text: '' });
-                        %>
-                        <input type="hidden" name="benefits_items" id="diferenciaisData">
-
-                        <div class="social-slots-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px;">
-                            <% bItems.forEach((item, idx) => { %>
-                                <div class="diferencial-slot-item" style="background: #F8FAFC; padding: 25px; border-radius: 25px; border: 1px solid #E2E8F0; transition: 0.3s;">
-                                    <div style="display: flex; flex-direction: column; gap: 15px;">
-                                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                                            <label style="font-size: 0.65rem; font-weight: 900; color: #94A3B8; text-transform: uppercase;">Diferencial Corporativo <%= idx + 1 %></label>
-                                            <i class="ri-medal-line" style="color: #E2E8F0; font-size: 1.2rem;"></i>
-                                        </div>
-                                        <div style="display: flex; flex-direction: column; gap: 8px;">
-                                            <label style="font-size: 0.7rem; font-weight: 800; color: #475569;">CÓDIGO DO ÍCONE (Remix Icon)</label>
-                                            <div style="display: flex; gap: 10px; align-items: center;">
-                                                <div class="icon-preview-box" style="width: 45px; height: 45px; background: white; border: 1px solid #E2E8F0; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--accent);">
-                                                    <i class="<%= item.icon || 'ri-star-line' %>"></i>
-                                                </div>
-                                                <div style="flex: 1; position: relative;">
-                                                    <input type="text" class="d-item-icon" list="iconSuggestions" placeholder="Digite a classe (ex: ri-rocket-line)" value="<%= item.icon %>" style="width: 100%; padding: 12px; padding-right: 35px; border-radius: 12px; border: 1px solid #E2E8F0; font-size: 0.85rem;" oninput="updateIconPreview(this)">
-                                                    <button type="button" onclick="this.previousElementSibling.value=''; updateIconPreview(this.previousElementSibling)" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #f1f5f9; border: none; color: #94a3b8; width: 22px; height: 22px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.7rem;"><i class="ri-close-line"></i></button>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div style="display: flex; flex-direction: column; gap: 8px;">
-                                            <label style="font-size: 0.7rem; font-weight: 800; color: #475569;">TÍTULO DO CARD</label>
-                                            <input type="text" class="d-item-title" placeholder="Ex: Qualidade Superior" value="<%= item.title %>" style="padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; font-weight: 700; font-size: 0.9rem;">
-                                        </div>
-
-                                        <div style="display: flex; flex-direction: column; gap: 8px;">
-                                            <label style="font-size: 0.7rem; font-weight: 800; color: #475569;">TEXTO DESCRITIVO</label>
-                                            <textarea class="d-item-text" placeholder="Descreva o diferencial aqui..." style="padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; height: 90px; font-size: 0.85rem;"><%= item.text %></textarea>
-                                        </div>
-                                    </div>
-                                </div>
-                            <% }) %>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- HOME: ARTIGOS -->
                 <div id="tab-home-artigos" class="tab-panel">
