@@ -64,7 +64,7 @@ async function setupDB() {
             'license_pdf VARCHAR(255)', 'license_auth_code VARCHAR(255)',
             'admin_primary_color VARCHAR(20) DEFAULT "#0A1128"', 'admin_accent_color VARCHAR(20) DEFAULT "#D62828"', 
             'admin_logo VARCHAR(255)', 'admin_header_logo VARCHAR(255)',
-            'contact_form_fields TEXT', 'header_strip_text TEXT'
+            'contact_form_fields TEXT', 'header_strip_text TEXT', 'beneficios_json TEXT'
         ];
         for (const col of columns) {
             try {
@@ -502,7 +502,7 @@ app.post('/admin/conteudo', upload.fields([
         'blog_page_newsletter_text', 'contact_page_description', 'site_menu', 'home_hero_card_title',
         'home_hero_card_subtitle', 'home_about_button_text', 'home_services_button_text', 'about_story_image',
         'about_story_lead', 'about_guidelines_title', 'about_guidelines_text',
-        'social_links', 'beneficios_json', 'hero_overlay_color',
+        'social_links', 'benefits_title', 'benefits_text', 'beneficios_json', 'hero_overlay_color',
         'hero_overlay_opacity', 'contact_phone', 'contact_email', 'address_full', 'contact_map_url',
         'contact_form_title', 'contact_form_recipient', 'license_qr_code', 'license_nf_data',
         'license_pdf', 'license_auth_code', 'admin_primary_color', 'admin_accent_color', 'admin_logo', 'admin_header_logo', 'contact_form_fields'
@@ -524,42 +524,55 @@ app.post('/admin/conteudo', upload.fields([
         delete updateData[fileKey];
     });
 
-    // Filtrar apenas campos que existem no banco
+    // 1. SINCRONIZAÇÃO DA TABELA DE BENEFÍCIOS (Independente do UPDATE principal)
+    if (req.body.beneficios_json) {
+        try {
+            const items = JSON.parse(req.body.beneficios_json);
+            console.log(`📦 Sincronizando ${items.length} benefícios...`);
+            
+            // Usar uma conexão única para garantir a ordem das operações
+            const conn = await pool.getConnection();
+            try {
+                await conn.query('DELETE FROM beneficios');
+                for (let i = 0; i < items.length; i++) {
+                    const item = items[i];
+                    if (item.icone || item.titulo || item.texto) {
+                        await conn.query(
+                            'INSERT INTO beneficios (icone, titulo, texto, ordem) VALUES (?, ?, ?, ?)', 
+                            [item.icone || 'ri-checkbox-circle-line', item.titulo || '', item.texto || '', i]
+                        );
+                    }
+                }
+                console.log('✅ Tabela de benefícios sincronizada.');
+            } finally {
+                conn.release();
+            }
+        } catch (err) { 
+            console.error('❌ ERRO NA TABELA BENEFICIOS:', err); 
+        }
+    }
+
+    // 2. FILTRAGEM E UPDATE DAS CONFIGURAÇÕES GLOBAIS
     const filteredData = {};
     Object.keys(updateData).forEach(key => {
-        if (validColumns.includes(key)) {
+        // Removemos 'beneficios_json' daqui pois ele é tratado acima separadamente
+        if (validColumns.includes(key) && key !== 'beneficios_json' && updateData[key] !== undefined) {
             filteredData[key] = updateData[key];
         }
     });
 
     const fields = Object.keys(filteredData);
-    if(fields.length === 0) return res.redirect('/admin/conteudo');
+    if(fields.length === 0) return res.redirect('/admin/conteudo?success=1');
     
     const sets = fields.map(f => `${f} = ?`).join(', ');
     const values = Object.values(filteredData);
 
     try {
         await pool.execute(`UPDATE configuracoes_globais SET ${sets} WHERE id = 1`, values);
-        
-        // Sincronizar nova tabela de Benefícios (Estrutura Nova)
-        if (req.body.beneficios_json) {
-            try {
-                const items = JSON.parse(req.body.beneficios_json);
-                await pool.execute('DELETE FROM beneficios');
-                for (const item of items) {
-                    if (item.titulo || item.texto) {
-                        await pool.execute('INSERT INTO beneficios (icone, titulo, texto) VALUES (?, ?, ?)', 
-                            [item.icone || 'ri-checkbox-circle-line', item.titulo, item.texto]);
-                    }
-                }
-            } catch (err) { console.error('❌ ERROR SYNCING BENEFICIOS TABLE:', err); }
-        }
-
-
         const activeTab = req.body.active_tab || '';
         res.redirect(`/admin/conteudo?success=1${activeTab ? '&tab=' + activeTab : ''}`);
     } catch (e) { 
-        console.error('❌ CMS SAVE ERROR:', e);
+        console.error('❌ CMS UPDATE ERROR:', e);
         const activeTab = req.body.active_tab || '';
         res.redirect(`/admin/conteudo?error=1${activeTab ? '&tab=' + activeTab : ''}`); 
     }

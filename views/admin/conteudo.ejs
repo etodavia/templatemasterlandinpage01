@@ -479,7 +479,20 @@ Contato|/contato"><%= settings.site_menu %></textarea>
                 <!-- HOME: BENEFÍCIOS -->
                 <div id="tab-home-beneficios" class="tab-panel">
                     <div class="section-header"><h3>Home Page » Gestão de Benefícios (Iconbox)</h3></div>
-                    <div style="margin-top: 30px;">
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Título da Seção (Impacto)</label>
+                            <input type="text" name="benefits_title" value="<%= settings.benefits_title %>">
+                            <p class="field-note"><i class="ri-information-line"></i> Use &lt;em&gt;texto&lt;/em&gt; para aplicar a fonte alternada.</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Subtítulo / Texto de Apoio</label>
+                            <input type="text" name="benefits_text" value="<%= settings.benefits_text %>">
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 50px;">
                         <h4 style="font-size: 0.85rem; font-weight: 900; color: var(--primary); text-transform: uppercase; margin-bottom: 5px; border-bottom: 2px solid #F1F5F9; padding-bottom: 15px;">
                             <i class="ri-list-check-3" style="color: var(--accent);"></i> Hub de Benefícios Dinâmico
                         </h4>
@@ -487,9 +500,14 @@ Contato|/contato"><%= settings.site_menu %></textarea>
                         
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                             <p class="field-note" style="margin: 0;">Adicione quantos benefícios desejar. Cada um terá um ícone, título e uma frase curta.</p>
-                            <button type="button" onclick="addNewBeneficio()" class="btn-premium" style="background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 12px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.75rem;">
-                                <i class="ri-add-line"></i> ADICIONAR
-                            </button>
+                            <div style="display: flex; gap: 10px;">
+                                <button type="button" onclick="addNewBeneficio()" class="btn-premium" style="background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 12px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.75rem;">
+                                    <i class="ri-add-line"></i> ADICIONAR
+                                </button>
+                                <button type="submit" class="btn-premium" style="background: #10B981; color: white; border: none; padding: 10px 20px; border-radius: 12px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.75rem;">
+                                    <i class="ri-save-line"></i> SALVAR AGORA
+                                </button>
+                            </div>
                         </div>
 
                         <div id="beneficios-dynamic-list" style="display: flex; flex-direction: column; gap: 15px;">
@@ -897,10 +915,7 @@ Contato|/contato"><%= settings.site_menu %></textarea>
         });
 
         // --- EDITOR DE BENEFÍCIOS DINÂMICO ---
-        let beneficiosList = [];
-        try {
-            beneficiosList = JSON.parse(`<%- JSON.stringify(locals.beneficios || []) %>`);
-        } catch(e) { beneficiosList = []; }
+        let beneficiosList = <%- JSON.stringify(locals.beneficios || []) %>;
 
         function renderBeneficios() {
             const container = document.getElementById('beneficios-dynamic-list');
