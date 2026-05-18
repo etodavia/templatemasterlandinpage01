@@ -65,7 +65,8 @@ async function setupDB() {
             'admin_primary_color VARCHAR(20) DEFAULT "#0A1128"', 'admin_accent_color VARCHAR(20) DEFAULT "#D62828"', 
             'admin_logo VARCHAR(255)', 'admin_header_logo VARCHAR(255)',
             'contact_form_fields TEXT', 'header_strip_text TEXT', 'beneficios_json TEXT',
-            'benefits_icon_bg VARCHAR(50)', 'benefits_icon_color VARCHAR(50)', 'benefits_title_color VARCHAR(50)', 'benefits_text_color VARCHAR(50)'
+            'benefits_icon_bg VARCHAR(50)', 'benefits_icon_color VARCHAR(50)', 'benefits_title_color VARCHAR(50)', 'benefits_text_color VARCHAR(50)',
+            'meta_title_home VARCHAR(255)', 'meta_description_home TEXT', 'facebook_pixel TEXT', 'google_analytics TEXT'
         ];
         for (const col of columns) {
             try {
@@ -518,7 +519,8 @@ app.post('/admin/conteudo', upload.fields([
         'hero_overlay_color',
         'hero_overlay_opacity', 'contact_phone', 'contact_email', 'address_full', 'contact_map_url',
         'contact_form_title', 'contact_form_recipient', 'license_qr_code', 'license_nf_data',
-        'license_pdf', 'license_auth_code', 'admin_primary_color', 'admin_accent_color', 'admin_logo', 'admin_header_logo', 'contact_form_fields'
+        'license_pdf', 'license_auth_code', 'admin_primary_color', 'admin_accent_color', 'admin_logo', 'admin_header_logo', 'contact_form_fields',
+        'header_strip_text', 'meta_title_home', 'meta_description_home', 'meta_keywords', 'facebook_pixel', 'google_analytics', 'pinterest_pixel', 'linkedin_pixel', 'custom_head_code', 'custom_body_code'
     ];
 
     // Processar Uploads
@@ -570,7 +572,11 @@ app.post('/admin/conteudo', upload.fields([
     validColumns.forEach(key => {
         // Ignoramos beneficios_json que já foi tratado, e só pegamos o que existe no updateData
         if (key !== 'beneficios_json' && updateData[key] !== undefined) {
-            filteredData[key] = updateData[key];
+            let val = updateData[key];
+            if (Array.isArray(val)) {
+                val = val[0];
+            }
+            filteredData[key] = val;
         }
     });
 
@@ -582,15 +588,16 @@ app.post('/admin/conteudo', upload.fields([
     const sets = fields.map(f => `\`${f}\` = ?`).join(', ');
     const values = Object.values(filteredData);
 
+    let sql = '';
     try {
-        const sql = `UPDATE configuracoes_globais SET ${sets} WHERE id = 1`;
+        sql = `UPDATE configuracoes_globais SET ${sets} WHERE id = 1`;
         await pool.query(sql, values);
         const activeTab = req.body.active_tab || '';
         res.redirect(`/admin/conteudo?success=1${activeTab ? '&tab=' + activeTab : ''}`);
     } catch (e) { 
         console.error('❌ CMS UPDATE ERROR:', e);
         const activeTab = req.body.active_tab || '';
-        res.redirect(`/admin/conteudo?error=1${activeTab ? '&tab=' + activeTab : ''}`); 
+        res.redirect(`/admin/conteudo?error=1${activeTab ? '&tab=' + activeTab : ''}`);
     }
 });
 
