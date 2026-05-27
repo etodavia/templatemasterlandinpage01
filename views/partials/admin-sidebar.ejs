@@ -23,10 +23,15 @@
     aside nav a.active { background: var(--admin-accent); color: white; box-shadow: 0 10px 20px rgba(214, 40, 40, 0.2); }
 
     @media (max-width: 992px) {
-        aside { position: fixed; left: -260px; height: 100vh; }
-        aside.active { left: 0; }
+        aside { position: fixed; left: -280px; height: 100vh; z-index: 10001; }
+        aside.active { left: 0; box-shadow: 10px 0 50px rgba(0,0,0,0.3); }
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 10000; backdrop-filter: blur(2px); opacity: 0; transition: opacity 0.3s; }
+        .sidebar-overlay.active { display: block; opacity: 1; }
     }
 </style>
+
+<!-- Overlay escuro no mobile -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleAdminMenu()"></div>
 
 <aside id="adminSidebar">
     <div style="padding: 1.5rem 1rem 2.5rem; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 1rem;">
@@ -53,21 +58,7 @@
                 </a>
             </li>
             <% } %>
-            <li>
-                <a href="/admin/leads" class="<%= (locals.title === 'Gestão de Leads' || locals.title === 'Gerenciar Leads') ? 'active' : '' %>">
-                    <i class="ri-user-voice-fill"></i> <span class="nav-text">Leads (Site)</span>
-                </a>
-            </li>
-            <li>
-                <a href="/admin/newsletter" class="<%= (locals.title === 'Newsletter') ? 'active' : '' %>">
-                    <i class="ri-mail-send-fill"></i> <span class="nav-text">Newsletter</span>
-                </a>
-            </li>
-            <li>
-                <a href="/admin/comentarios" class="<%= (locals.title === 'Moderação de Comentários') ? 'active' : '' %>">
-                    <i class="ri-chat-check-fill"></i> <span class="nav-text">Comentários</span>
-                </a>
-            </li>
+
             <li>
                 <a href="/admin/depoimentos" class="<%= (locals.title === 'Moderação de Depoimentos') ? 'active' : '' %>">
                     <i class="ri-star-smile-fill"></i> <span class="nav-text">Depoimentos</span>
@@ -85,26 +76,8 @@
                 </a>
             </li>
 
-            <li>
-                <a href="/admin/posts" class="<%= (locals.title.includes('Blog')) ? 'active' : '' %>">
-                    <i class="ri-article-fill"></i> <span class="nav-text">Blog</span>
-                </a>
-            </li>
-            <li>
-                <a href="/admin/servicos" class="<%= (locals.title.includes('Especialidades')) ? 'active' : '' %>">
-                    <i class="ri-briefcase-4-fill"></i> <span class="nav-text">Especialidades</span>
-                </a>
-            </li>
-            <li>
-                <a href="/admin/equipe" class="<%= (locals.title.includes('Equipe')) ? 'active' : '' %>">
-                    <i class="ri-team-fill"></i> <span class="nav-text">Gestão de Equipe</span>
-                </a>
-            </li>
-            <li>
-                <a href="/admin/conteudo?tab=tab-page-contato" class="<%= (locals.activeTab === 'tab-page-contato') ? 'active' : '' %>" style="color: #4ade80 !important;">
-                    <i class="ri-edit-box-fill"></i> <span class="nav-text">Editor de Form</span>
-                </a>
-            </li>
+            <!-- Especialidades, Blog e Equipe removidos do projeto Landing Page -->
+            <!-- Editor de Form removed for Logistica project -->
             <li style="margin-bottom: 2rem">
                 <a href="/admin/perfil" class="<%= (locals.title === 'Meu Perfil') ? 'active' : '' %>">
                     <i class="ri-user-settings-fill"></i> <span class="nav-text">Meu Perfil</span>
@@ -115,7 +88,7 @@
                 <a href="/" target="_blank"><i class="ri-external-link-fill"></i> <span class="nav-text">Ver Site Público</span></a>
             </li>
             <li>
-                <a href="/admin/login" style="color: #ff4d4d;"><i class="ri-logout-box-r-fill"></i> <span class="nav-text">Sair do Painel</span></a>
+                <a href="/api/auth/logout" style="color: #ff4d4d;"><i class="ri-logout-box-r-fill"></i> <span class="nav-text">Sair do Painel</span></a>
             </li>
         </ul>
     </nav>
@@ -126,6 +99,8 @@
         const sidebar = document.getElementById('adminSidebar');
         if (window.innerWidth <= 992) {
             sidebar.classList.toggle('active');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (overlay) overlay.classList.toggle('active');
         } else {
             sidebar.classList.toggle('collapsed');
             document.body.classList.toggle('sidebar-collapsed');
@@ -134,10 +109,11 @@
     // Fechar ao clicar fora no mobile
     document.addEventListener('click', (e) => {
         const sidebar = document.getElementById('adminSidebar');
-        const floatingBtn = document.querySelector('.menu-toggle-floating');
+        const overlay = document.getElementById('sidebarOverlay');
         if (window.innerWidth <= 992 && sidebar.classList.contains('active')) {
-            if (!sidebar.contains(e.target) && !e.target.closest('.menu-toggle-btn') && !e.target.closest('.menu-toggle-floating')) {
+            if (!sidebar.contains(e.target) && !e.target.closest('.menu-toggle-btn') && e.target !== overlay) {
                 sidebar.classList.remove('active');
+                if(overlay) overlay.classList.remove('active');
             }
         }
     });

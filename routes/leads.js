@@ -2,6 +2,13 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../config/db');
 
+function requireAuth(req, res, next) {
+    if (!req.user) {
+        return res.status(401).json({ msg: 'Autenticação necessária.' });
+    }
+    next();
+}
+
 // @route   POST api/leads (Public)
 // @desc    Register a new lead
 router.post('/', async (req, res) => {
@@ -17,7 +24,7 @@ router.post('/', async (req, res) => {
 });
 
 // @route   GET api/leads (Admin)
-router.get('/', async (req, res) => {
+router.get('/', requireAuth, async (req, res) => {
     try {
         // CORREÇÃO: Usando a coluna 'created_at' como no schema.sql
         const [rows] = await pool.execute('SELECT * FROM contatos ORDER BY created_at DESC');

@@ -4,6 +4,13 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const pool = require('../config/db');
 
+const cookieOptions = {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 12 * 60 * 60 * 1000
+};
+
 // @route   POST api/auth/login
 // @desc    Authenticate admin & get token (Prepared Statements!)
 router.post('/login', async (req, res) => {
@@ -31,13 +38,20 @@ router.post('/login', async (req, res) => {
         };
         jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '12h' }, (err, token) => {
             if (err) throw err;
-            res.json({ token, role: user.nivel });
+            res.cookie('token', token, cookieOptions);
+            res.json({ ok: true, role: user.nivel });
         });
 
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Erro no servidor.');
     }
+});
+
+router.get('/logout', (req, res) => {
+    res.clearCookie('token', { path: '/' });
+    res.clearCookie('userRole', { path: '/' });
+    res.redirect('/admin/login');
 });
 
 module.exports = router;

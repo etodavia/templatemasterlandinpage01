@@ -105,6 +105,10 @@ p.subtitle { color: var(--text-muted); font-size: 1rem; margin-top: -20px; margi
 
 /* Forms */
 .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+@media (max-width: 992px) {
+    .form-grid { grid-template-columns: 1fr !important; }
+    .form-group.full { grid-column: 1 / -1 !important; }
+}
 .form-group { margin-bottom: 24px; }
 .form-group.full { grid-column: span 2; }
 .form-group label { 

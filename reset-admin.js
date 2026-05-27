@@ -9,7 +9,7 @@ async function reset() {
         host: process.env.DB_HOST || 'localhost',
         user: process.env.DB_USER || 'root',
         password: process.env.DB_PASS || '',
-        database: process.env.DB_NAME || 'arque_gestao',
+        database: process.env.DB_NAME || 'logistica01',
         port: process.env.DB_PORT || 3306
     });
 
@@ -20,13 +20,13 @@ async function reset() {
         console.log('⏳ Atualizando usuário administrador...');
         
         // Remove se existir e cria de novo para garantir
-        await connection.query('DELETE FROM usuarios WHERE email = "admin@arquegestao.com.br"');
+        await connection.query('DELETE FROM usuarios WHERE email = "admin@site.com"');
         await connection.query('INSERT INTO usuarios (nome, email, senha, nivel) VALUES (?, ?, ?, ?)', 
-            ['Admin ARQUÊ', 'admin@arquegestao.com.br', hash, 'admin']
+            ['Admin do Sistema', 'admin@site.com', hash, 'admin']
         );
 
         console.log('✅ SENHA RESETADA COM SUCESSO!');
-        console.log('👉 E-mail: admin@arquegestao.com.br');
+        console.log('👉 E-mail: admin@site.com');
         console.log('👉 Senha: Et.123654*');
         console.log('🚀 Pode tentar o login novamente agora!');
         process.exit(0);

@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?<%= fontsQuery %>&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/main.css?v=<%= Date.now() %>">
+<link rel="stylesheet" href="/css/main.css?v=<%= locals.assetVersion || '1' %>">
 <style>
     :root {
         --navy-blue: <%= settings.color_marinho || '#0A1128' %>;

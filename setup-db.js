@@ -19,12 +19,12 @@ async function setup() {
         console.log('⏳ Criando banco de dados e tabelas...');
         const sql = fs.readFileSync(path.join(__dirname, 'database', 'schema.sql'), 'utf8');
         
-        await connection.query(`CREATE DATABASE IF NOT EXISTS ${process.env.DB_NAME || 'arque_gestao'};`);
-        await connection.query(`USE ${process.env.DB_NAME || 'arque_gestao'};`);
+        await connection.query(`CREATE DATABASE IF NOT EXISTS ${process.env.DB_NAME || 'logistica01'};`);
+        await connection.query(`USE ${process.env.DB_NAME || 'logistica01'};`);
         await connection.query(sql);
 
-        console.log('✅ DATABASE ARQUÊ GESTÃO PRONTA!');
-        console.log('🚀 Agora você já pode fazer login: admin@teste.com / Et.123654*');
+        console.log('✅ DATABASE PRONTA!');
+        console.log('🚀 Agora você pode usar o banco configurado em DB_NAME.');
         process.exit(0);
     } catch (err) {
         console.error('❌ ERRO NO SETUP:', err.message);

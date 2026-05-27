@@ -177,12 +177,6 @@
                 
                 const result = await response.json();
                 if (response.ok) {
-                    localStorage.setItem('token', result.token);
-                    localStorage.setItem('userRole', result.role);
-                    
-                    document.cookie = `token=${result.token}; path=/; max-age=43200; SameSite=Lax`;
-                    document.cookie = `userRole=${result.role}; path=/; max-age=43200; SameSite=Lax`;
-
                     window.location.href = '/admin/dashboard';
                 } else {
                     alert(result.msg || 'Erro ao logar');

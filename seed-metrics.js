@@ -7,7 +7,7 @@ async function seed() {
         host: process.env.DB_HOST || 'localhost',
         user: process.env.DB_USER || 'root',
         password: process.env.DB_PASSWORD || '',
-        database: process.env.DB_NAME || 'arque_gestao',
+        database: process.env.DB_NAME || 'logistica01',
         port: parseInt(process.env.DB_PORT) || 3306
     });
 

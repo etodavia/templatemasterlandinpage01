@@ -28,6 +28,21 @@ CREATE TABLE IF NOT EXISTS newsletter (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Cache de Avaliações do Google Meu Negócio
+CREATE TABLE IF NOT EXISTS google_reviews (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    review_id VARCHAR(255) UNIQUE NOT NULL,
+    author_name VARCHAR(255),
+    profile_photo_url VARCHAR(512),
+    rating INT DEFAULT 5,
+    comment TEXT,
+    review_url VARCHAR(512),
+    review_time DATETIME NULL,
+    ativo BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Tabela de Configurações Globais (WhatsApp, SEO, Pixels)
 CREATE TABLE IF NOT EXISTS configuracoes_globais (
     id INT PRIMARY KEY DEFAULT 1,
@@ -44,7 +59,7 @@ CREATE TABLE IF NOT EXISTS configuracoes_globais (
 -- Inserir Usuário Admin Padrão (Senha: Et.123654*)
 -- Hash bcrypt para 'Et.123654*'
 INSERT IGNORE INTO usuarios (id, nome, email, senha, nivel) 
-VALUES (1, 'Admin ARQUÊ', 'admin@teste.com', '$2a$10$7Z2vO6R6uI.XqW0v1jGq6.X4lB8y9Tf9u8A0j6y1.z.f.p.d.e.g.', 'admin');
+VALUES (1, 'Admin do Sistema', 'admin@site.com', '$2a$10$7Z2vO6R6uI.XqW0v1jGq6.X4lB8y9Tf9u8A0j6y1.z.f.p.d.e.g.', 'admin');
 
 -- Configuração Inicial
 INSERT IGNORE INTO configuracoes_globais (id, whatsapp, cnpj) 

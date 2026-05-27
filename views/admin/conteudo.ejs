@@ -41,13 +41,13 @@
         .btn-collapse-sub:hover { background: var(--accent); color: white; }
 
         /* RESPONSIVIDADE MULTI-DISPOSITIVO (TABLET & MOBILE) */
-        @media (max-width: 768px) {
+        @media (max-width: 992px) {
             .cms-layout { flex-direction: column; height: auto !important; }
             .cms-tabs-nav { 
-                width: 100% !important; height: auto; display: flex; overflow-x: auto; 
+                width: 100% !important; height: auto; display: flex; flex-direction: row !important; flex-wrap: nowrap !important; overflow-x: auto; 
                 padding: 5px 10px; border-right: none; border-bottom: 1px solid #eee; 
                 white-space: nowrap; scrollbar-width: none; -ms-overflow-style: none;
-                background: #f8fafc; gap: 5px;
+                background: #f8fafc; gap: 5px; align-items: center;
             }
             .cms-tabs-nav.collapsed { width: 100% !important; }
             .btn-collapse-sub { display: none; }
@@ -55,13 +55,19 @@
             .cms-tabs-nav::-webkit-scrollbar { display: none; }
             .tab-category-header { display: none; }
             .tab-link { 
-                padding: 10px 15px; border-right: none; border-bottom: 2px solid transparent; 
-                flex-direction: column; gap: 4px; text-align: center; min-width: 80px;
+                padding: 10px 15px !important; border-right: none !important; border-bottom: 2px solid transparent; border-left: none !important;
+                flex-direction: column; gap: 4px; text-align: center; min-width: 80px; margin-bottom: 0 !important;
+                flex-shrink: 0; /* IMPEDE QUE OS TEXTOS SE ESPREMEM */
             }
+            .scroll-hint-mobile { display: flex !important; }
             .tab-link i { font-size: 1.2rem; }
-            .tab-link.active { border-bottom-color: var(--accent); background: white; }
+            .tab-link.active { border-bottom-color: var(--accent) !important; background: white !important; }
             .cms-content { padding: 20px; }
+            
+            /* FORÇAR GRIDS INLINE A 1 COLUNA NO MOBILE */
+            .cms-content [style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
         }
+        .scroll-hint-mobile { display: none; background: #f1f5f9; color: #64748b; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; text-align: center; padding: 8px; align-items: center; justify-content: center; gap: 5px; border-bottom: 1px solid #eee; letter-spacing: 1px; }
     </style>
 </head>
 <body>
@@ -92,6 +98,7 @@
             <%- include('../partials/admin-header') %>
             
             <div class="cms-layout">
+            <div class="scroll-hint-mobile"><i class="ri-drag-move-fill"></i> Deslize para os lados para ver mais opções <i class="ri-arrow-right-line"></i></div>
             <nav class="cms-tabs-nav" id="cmsSubNav">
                 <button type="button" class="btn-collapse-sub" onclick="toggleSubNav()"><i class="ri-arrow-left-right-line"></i></button>
 
@@ -112,18 +119,12 @@
                 <div class="tab-category-header">Home Page</div>
                 <div class="tab-link" onclick="switchTab('tab-home-hero')"><i class="ri-flashlight-line"></i> <span>Hero</span></div>
                 <div class="tab-link" onclick="switchTab('tab-home-sobre')"><i class="ri-user-3-line"></i> <span>Sobre</span></div>
-                <div class="tab-link" onclick="switchTab('tab-home-servicos')"><i class="ri-service-line"></i> <span>Serviços</span></div>
                 <div class="tab-link" onclick="switchTab('tab-home-beneficios')"><i class="ri-heart-pulse-line"></i> <span>Benefícios</span></div>
 
-                <div class="tab-link" onclick="switchTab('tab-home-artigos')"><i class="ri-article-line"></i> <span>Artigos</span></div>
                 <div class="tab-link" onclick="switchTab('tab-home-depoimentos')"><i class="ri-chat-quote-line"></i> <span>Depoimentos</span></div>
-                <div class="tab-link" onclick="switchTab('tab-home-newsletter')"><i class="ri-mail-send-line"></i> <span>Newsletter</span></div>
+                <div class="tab-link" onclick="switchTab('tab-home-contato')"><i class="ri-contacts-book-2-line"></i> <span>Contato Home</span></div>
 
-                <div class="tab-category-header">Páginas Internas</div>
-                <div class="tab-link" onclick="switchTab('tab-page-sobre')"><i class="ri-pages-line"></i> <span>Página Sobre</span></div>
-                <div class="tab-link" onclick="switchTab('tab-page-servicos')"><i class="ri-building-line"></i> <span>Página Serviços</span></div>
-                <div class="tab-link" onclick="switchTab('tab-page-blog')"><i class="ri-chat-3-line"></i> <span>Página Blog</span></div>
-                <div class="tab-link" onclick="switchTab('tab-page-contato')"><i class="ri-contacts-book-line"></i> <span>Página Contato</span></div>
+
 
                 <div class="tab-category-header">Estrutura</div>
                 <div class="tab-link" onclick="switchTab('tab-footer')"><i class="ri-layout-bottom-line"></i> <span>Rodapé</span></div>
@@ -172,9 +173,16 @@
                                 { label: 'Fundo do Rodapé', name: 'color_footer', value: settings.color_footer || '#0A1128' },
                                 { label: 'Texto do Rodapé', name: 'color_footer_text', value: settings.color_footer_text || '#FFFFFF' },
                                 { label: 'Fundo Seção Sobre', name: 'color_about_bg', value: settings.color_about_bg || '#F7F7F4' },
-                                { label: 'Fundo Seção Blog', name: 'color_blog_bg', value: settings.color_blog_bg || '#0A1128' },
-                                { label: 'Texto Seção Blog', name: 'color_blog_text', value: settings.color_blog_text || '#FFFFFF' },
-                                { label: 'Fundo Contato/News', name: 'color_contact_bg', value: settings.color_contact_bg || '#F7F7F4' }
+
+                                { label: 'Fundo Contato/News', name: 'color_contact_bg', value: settings.color_contact_bg || '#F7F7F4' },
+                                { label: 'Benefícios (Fundo Seção)', name: 'benefits_color', value: settings.benefits_color || '#F8FAFC' },
+                                { label: 'Benefícios (Título Seção)', name: 'benefits_title_color', value: settings.benefits_title_color || '#0A1128' },
+                                { label: 'Benefícios (Texto Seção)', name: 'benefits_text_color', value: settings.benefits_text_color || '#64748b' },
+                                { label: 'Benefícios (Fundo Card)', name: 'benefits_card_bg', value: settings.benefits_card_bg || '#FFFFFF' },
+                                { label: 'Benefícios (Título Card)', name: 'benefits_card_title_color', value: settings.benefits_card_title_color || '#0A1128' },
+                                { label: 'Benefícios (Texto Card)', name: 'benefits_card_text_color', value: settings.benefits_card_text_color || '#64748b' },
+                                { label: 'Benefícios (Fundo Ícone)', name: 'benefits_icon_bg', value: settings.benefits_icon_bg || '#FFFFFF' },
+                                { label: 'Benefícios (Ícone)', name: 'benefits_icon_color', value: settings.benefits_icon_color || '#D62828' }
                             ]
                         %>
 
@@ -537,7 +545,7 @@ Contato|/contato"><%= settings.site_menu %></textarea>
                                 <button type="button" onclick="addNewBeneficio()" class="btn-premium" style="background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 12px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.75rem;">
                                     <i class="ri-add-line"></i> ADICIONAR
                                 </button>
-                                <button type="submit" class="btn-premium" style="background: #10B981; color: white; border: none; padding: 10px 20px; border-radius: 12px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.75rem;">
+                                <button type="submit" form="cmsForm" class="btn-premium" style="background: #10B981; color: white; border: none; padding: 10px 20px; border-radius: 12px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.75rem;">
                                     <i class="ri-save-line"></i> SALVAR AGORA
                                 </button>
                             </div>
@@ -552,19 +560,7 @@ Contato|/contato"><%= settings.site_menu %></textarea>
                         </button>
                     </div>
                 </div>
-                <!-- HOME: ARTIGOS -->
-                <div id="tab-home-artigos" class="tab-panel">
-                    <div class="section-header"><h3>Home Page » Seção Artigos</h3></div>
-                    <div class="form-group full">
-                        <label>Título Chamada (Insights)</label>
-                        <input type="text" name="blog_section_title" value="<%= settings.blog_section_title %>">
-                        <p class="field-note"><i class="ri-information-line"></i> Use &lt;em&gt;texto&lt;/em&gt; para aplicar a fonte alternada.</p>
-                    </div>
-                    <div class="form-group full">
-                        <label>Texto de Apoio</label>
-                        <input type="text" name="blog_section_text" value="<%= settings.blog_section_text %>">
-                    </div>
-                </div>
+
 
                 <!-- HOME: DEPOIMENTOS -->
                 <div id="tab-home-depoimentos" class="tab-panel">
@@ -576,19 +572,6 @@ Contato|/contato"><%= settings.site_menu %></textarea>
                     </div>
                 </div>
 
-                <!-- HOME: NEWSLETTER -->
-                <div id="tab-home-newsletter" class="tab-panel">
-                    <div class="section-header"><h3>Home Page » Seção Newsletter</h3></div>
-                    <div class="form-group full">
-                        <label>Título Convite</label>
-                        <input type="text" name="newsletter_section_title" value="<%= settings.newsletter_section_title %>">
-                        <p class="field-note"><i class="ri-information-line"></i> Use &lt;em&gt;texto&lt;/em&gt; para aplicar a fonte alternada.</p>
-                    </div>
-                    <div class="form-group full">
-                        <label>Descrição / Persuasão</label>
-                        <input type="text" name="newsletter_section_text" value="<%= settings.newsletter_section_text %>">
-                    </div>
-                </div>
 
                 <div id="tab-page-sobre" class="tab-panel">
                     <div class="section-header"><h3>Página: Sobre a ARQUÊΔ</h3></div>
@@ -673,26 +656,34 @@ Contato|/contato"><%= settings.site_menu %></textarea>
                     </div>
                 </div>
 
-                <div id="tab-page-blog" class="tab-panel">
-                    <div class="section-header"><h3>Página: Blog & Insights</h3></div>
+
+
+                <div id="tab-home-contato" class="tab-panel">
+                    <div class="section-header"><h3>Home: Seção Contato</h3></div>
                     <div class="form-grid">
-                        <div class="form-group">
-                            <label>Hero: Título</label>
-                            <input type="text" name="blog_hero_title" value="<%= settings.blog_hero_title %>">
+                        <div class="form-group full">
+                            <label>Título da Seção</label>
+                            <input type="text" name="contact_section_title" value="<%= settings.contact_section_title %>" placeholder="Ex: Entre em contato"> 
+                        </div>
+                        <div class="form-group full">
+                            <label>Subtítulo / Descrição</label>
+                            <textarea name="contact_section_subtitle" placeholder="Ex: Fale com nosso time para atendimento rápido e personalizado."><%= settings.contact_section_subtitle %></textarea>
                         </div>
                         <div class="form-group">
-                            <label>Hero: Imagem</label>
-                            <input type="file" name="blog_hero_image_file" accept="image/*">
-                            <input type="hidden" name="blog_hero_image" value="<%= settings.blog_hero_image %>">
-                            <% if (settings.blog_hero_image) { %> <img src="<%= settings.blog_hero_image %>" class="img-preview"> <% } %>
+                            <label>Telefone de Contato</label>
+                            <input type="text" name="contact_phone" value="<%= settings.contact_phone %>" placeholder="(11) 99999-9999">
                         </div>
                         <div class="form-group">
-                            <label>Mailing: Título</label>
-                            <input type="text" name="blog_page_newsletter_title" value="<%= settings.blog_page_newsletter_title %>">
+                            <label>E-mail de Contato</label>
+                            <input type="email" name="contact_email" value="<%= settings.contact_email %>" placeholder="contato@seudominio.com">
                         </div>
-                        <div class="form-group">
-                            <label>Mailing: Texto</label>
-                            <textarea name="blog_page_newsletter_text"><%= settings.blog_page_newsletter_text %></textarea>
+                        <div class="form-group full">
+                            <label>Endereço Completo</label>
+                            <input type="text" name="address_full" value="<%= settings.address_full %>" placeholder="Av. Paulista, 1000 - São Paulo, SP">
+                        </div>
+                        <div class="form-group full">
+                            <label>Link do Mapa (Google Maps Embed URL)</label>
+                            <input type="text" name="contact_map_url" value="<%= settings.contact_map_url %>" placeholder="https://www.google.com/maps/embed?pb=...">
                         </div>
                     </div>
                 </div>
@@ -848,11 +839,16 @@ Contato|/contato"><%= settings.site_menu %></textarea>
                                 </div>
                             </div>
 
-                            <div style="margin-top: 20px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 20px;">
-                                <div class="form-group full">
+                            <div style="margin-top: 20px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                                <div class="form-group">
+                                    <label>Versão do Template Master</label>
+                                    <input type="text" name="template_version" value="<%= settings.template_version || '1.0.0' %>" placeholder="Ex: 1.0.0" style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ddd; outline: none; font-size: 0.9rem; font-weight: 600; color: var(--primary);">
+                                    <p class="field-note" style="margin-top: 10px;"><i class="ri-git-repository-line"></i> Versão atual do código fonte instalado neste cliente.</p>
+                                </div>
+                                <div class="form-group">
                                     <label>Código de Pagamento Stripe Ativo (Para Liberação)</label>
-                                    <input type="text" name="license_stripe_payment_code" value="<%= settings.license_stripe_payment_code || '' %>" placeholder="Ex: ch_3Mt... ou pi_3Mt..." style="width: 100%; max-width: 450px; padding: 12px; border-radius: 12px; border: 1px solid #ddd; outline: none; font-size: 0.9rem; font-weight: 600; color: var(--primary);">
-                                    <p class="field-note" style="margin-top: 10px;"><i class="ri-stripe-line"></i> Cole aqui o ID de pagamento/cobrança retirado do seu painel do Stripe após a renovação. O cliente deverá digitar exatamente este código para ativar a licença.</p>
+                                    <input type="text" name="license_stripe_payment_code" value="<%= settings.license_stripe_payment_code || '' %>" placeholder="Ex: ch_3Mt... ou pi_3Mt..." style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ddd; outline: none; font-size: 0.9rem; font-weight: 600; color: var(--primary);">
+                                    <p class="field-note" style="margin-top: 10px;"><i class="ri-stripe-line"></i> Cole aqui o ID de pagamento após a renovação.</p>
                                 </div>
                             </div>
                         </div>
@@ -967,6 +963,7 @@ Contato|/contato"><%= settings.site_menu %></textarea>
 
         // Roteamento de Aba via URL (Licenciamento Elite)
         window.onload = function() {
+            bindDetachedControlsToCmsForm();
             // Aplicar estado do submenu
             if (localStorage.getItem('cmsSubNavCollapsed') === 'true') {
                 document.getElementById('cmsSubNav').classList.add('collapsed');
@@ -1013,8 +1010,24 @@ Contato|/contato"><%= settings.site_menu %></textarea>
             preview.className = val || 'ri-star-line';
         }
 
+        function bindDetachedControlsToCmsForm() {
+            const form = document.getElementById('cmsForm');
+            if (!form) return;
+            document.querySelectorAll('input[name], textarea[name], select[name], button[name]').forEach(control => {
+                if (control.id === 'activeTabInput') return;
+                if (control.form !== form) {
+                    control.setAttribute('form', 'cmsForm');
+                }
+            });
+        }
+
         // Hub de Redes Sociais: Consolidação JSON
         document.getElementById('cmsForm').addEventListener('submit', function(e) {
+            bindDetachedControlsToCmsForm();
+            const currentPanel = document.querySelector('.tab-panel.active');
+            const hiddenInput = document.getElementById('activeTabInput');
+            if (currentPanel && hiddenInput) hiddenInput.value = currentPanel.id;
+
             const slots = [];
             document.querySelectorAll('.social-slot-item').forEach(item => {
                 const network = item.querySelector('.social-network-select').value;
@@ -1024,7 +1037,8 @@ Contato|/contato"><%= settings.site_menu %></textarea>
                     slots.push({ network, url });
                 }
             });
-            document.getElementById('socialLinksData').value = JSON.stringify(slots);
+            const socialLinksData = document.getElementById('socialLinksData');
+            if (socialLinksData) socialLinksData.value = JSON.stringify(slots);
 
             // Hub de Diferenciais: Consolidação JSON
             const differentials = [];
@@ -1037,13 +1051,16 @@ Contato|/contato"><%= settings.site_menu %></textarea>
                     differentials.push({ icon, title, text });
                 }
             });
-            document.getElementById('diferenciaisData').value = JSON.stringify(differentials);
+            const diferenciaisData = document.getElementById('diferenciaisData');
+            if (diferenciaisData) diferenciaisData.value = JSON.stringify(differentials);
 
             // Consolidação JSON do Hub de Benefícios
-            document.getElementById('beneficiosJsonData').value = JSON.stringify(beneficiosList);
+            const beneficiosJsonData = document.getElementById('beneficiosJsonData');
+            if (beneficiosJsonData) beneficiosJsonData.value = JSON.stringify(beneficiosList);
 
             // Consolidação JSON do Editor de Formulário
-            document.getElementById('contact_form_fields_json').value = JSON.stringify(formFields);
+            const contactFormFieldsJson = document.getElementById('contact_form_fields_json');
+            if (contactFormFieldsJson) contactFormFieldsJson.value = JSON.stringify(formFields);
         });
 
         // --- EDITOR DE BENEFÍCIOS DINÂMICO ---

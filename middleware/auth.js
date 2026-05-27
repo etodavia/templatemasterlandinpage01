@@ -1,8 +1,19 @@
 const jwt = require('jsonwebtoken');
 
 module.exports = function(req, res, next) {
-    // Get token from header (x-auth-token)
-    const token = req.header('x-auth-token');
+    const cookies = (req.headers.cookie || '').split(';').reduce((acc, pair) => {
+        const index = pair.indexOf('=');
+        if (index === -1) return acc;
+        const key = pair.slice(0, index).trim();
+        const value = pair.slice(index + 1).trim();
+        try {
+            acc[key] = decodeURIComponent(value);
+        } catch (e) {
+            acc[key] = value;
+        }
+        return acc;
+    }, {});
+    const token = req.header('x-auth-token') || cookies.token;
 
     // Check if not token
     if (!token) {

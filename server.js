@@ -9,19 +9,198 @@ const dotenv = require('dotenv');
 const bcrypt = require('bcryptjs');
 
 dotenv.config();
+const ASSET_VERSION = process.env.ASSET_VERSION || require('./package.json').version || '1';
+const ALLOWED_UPLOAD_MIMES = new Set([
+    'image/jpeg',
+    'image/png',
+    'image/webp',
+    'image/gif',
+    'image/svg+xml',
+    'application/pdf'
+]);
+
+function parseCookies(cookieHeader = '') {
+    return cookieHeader.split(';').reduce((cookies, pair) => {
+        const index = pair.indexOf('=');
+        if (index === -1) return cookies;
+        const key = pair.slice(0, index).trim();
+        const value = pair.slice(index + 1).trim();
+        if (!key) return cookies;
+        try {
+            cookies[key] = decodeURIComponent(value);
+        } catch (e) {
+            cookies[key] = value;
+        }
+        return cookies;
+    }, {});
+}
+
+function createRateLimiter({ windowMs, max, message }) {
+    const attempts = new Map();
+    return (req, res, next) => {
+        const now = Date.now();
+        const ip = req.ip || req.connection.remoteAddress || 'unknown';
+        const current = attempts.get(ip) || [];
+        const recent = current.filter(timestamp => now - timestamp < windowMs);
+        if (recent.length >= max) {
+            return res.status(429).json({ msg: message });
+        }
+        recent.push(now);
+        attempts.set(ip, recent);
+        next();
+    };
+}
+
+function requireApiAuth(req, res, next) {
+    if (!req.user) {
+        return res.status(401).json({ msg: 'Autenticacao necessaria.' });
+    }
+    next();
+}
+
+function getTabFromReferer(req) {
+    try {
+        const referer = req.get('referer');
+        if (!referer) return '';
+        const url = new URL(referer);
+        return url.searchParams.get('tab') || '';
+    } catch (e) {
+        return '';
+    }
+}
+
+function cmsRedirect(req, status) {
+    const activeTab = req.body?.active_tab || getTabFromReferer(req);
+    const params = new URLSearchParams({ [status]: '1' });
+    if (activeTab) params.set('tab', activeTab);
+    return `/admin/conteudo?${params.toString()}`;
+}
+
+const loginRateLimit = createRateLimiter({
+    windowMs: 15 * 60 * 1000,
+    max: 20,
+    message: 'Muitas tentativas de login. Tente novamente em alguns minutos.'
+});
+const publicFormRateLimit = createRateLimiter({
+    windowMs: 10 * 60 * 1000,
+    max: 30,
+    message: 'Muitas solicitacoes. Tente novamente em alguns minutos.'
+});
+
+const googleReviewRatingMap = {
+    ONE: 1,
+    TWO: 2,
+    THREE: 3,
+    FOUR: 4,
+    FIVE: 5
+};
+
+function googleReviewsConfigured() {
+    return Boolean(
+        process.env.GOOGLE_BUSINESS_ACCOUNT_ID &&
+        process.env.GOOGLE_BUSINESS_LOCATION_ID &&
+        process.env.GOOGLE_CLIENT_ID &&
+        process.env.GOOGLE_CLIENT_SECRET &&
+        process.env.GOOGLE_REFRESH_TOKEN
+    );
+}
+
+async function getGoogleAccessToken() {
+    const response = await fetch('https://oauth2.googleapis.com/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+            client_id: process.env.GOOGLE_CLIENT_ID,
+            client_secret: process.env.GOOGLE_CLIENT_SECRET,
+            refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
+            grant_type: 'refresh_token'
+        })
+    });
+
+    const data = await response.json();
+    if (!response.ok || !data.access_token) {
+        throw new Error(data.error_description || data.error || 'Falha ao autenticar no Google.');
+    }
+    return data.access_token;
+}
+
+async function syncGoogleReviews() {
+    if (!googleReviewsConfigured()) {
+        throw new Error('Configure as variaveis GOOGLE_BUSINESS_* e GOOGLE_* no .env.');
+    }
+
+    const token = await getGoogleAccessToken();
+    const accountId = encodeURIComponent(process.env.GOOGLE_BUSINESS_ACCOUNT_ID);
+    const locationId = encodeURIComponent(process.env.GOOGLE_BUSINESS_LOCATION_ID);
+    const pageSize = parseInt(process.env.GOOGLE_REVIEWS_PAGE_SIZE, 10) || 20;
+    const minRating = parseInt(process.env.GOOGLE_REVIEWS_MIN_RATING, 10) || 4;
+    const url = `https://mybusiness.googleapis.com/v4/accounts/${accountId}/locations/${locationId}/reviews?pageSize=${pageSize}&orderBy=updateTime desc`;
+
+    const response = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.error?.message || 'Falha ao buscar avaliacoes no Google.');
+    }
+
+    const reviews = Array.isArray(data.reviews) ? data.reviews : [];
+    let saved = 0;
+    for (const review of reviews) {
+        const rating = googleReviewRatingMap[review.starRating] || 0;
+        const text = (review.comment || '').trim();
+        if (rating < minRating || !text) continue;
+
+        const reviewer = review.reviewer || {};
+        await pool.execute(`
+            INSERT INTO google_reviews 
+                (review_id, author_name, profile_photo_url, rating, comment, review_url, review_time, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
+            ON DUPLICATE KEY UPDATE
+                author_name = VALUES(author_name),
+                profile_photo_url = VALUES(profile_photo_url),
+                rating = VALUES(rating),
+                comment = VALUES(comment),
+                review_url = VALUES(review_url),
+                review_time = VALUES(review_time),
+                updated_at = NOW()
+        `, [
+            review.name,
+            reviewer.displayName || 'Cliente Google',
+            reviewer.profilePhotoUrl || null,
+            rating,
+            text,
+            review.reviewUrl || null,
+            review.createTime ? new Date(review.createTime) : null
+        ]);
+        saved += 1;
+    }
+
+    return { received: reviews.length, saved };
+}
 
 // Configuração Upload Multer Centralizado
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        const dir = './public/uploads';
+        const dir = path.join(__dirname, 'public', 'uploads');
         if (!fs.existsSync(dir)){ fs.mkdirSync(dir, { recursive: true }); }
         cb(null, dir);
     },
     filename: (req, file, cb) => {
-        cb(null, Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname));
+        const ext = path.extname(file.originalname).toLowerCase();
+        cb(null, Date.now() + '-' + Math.round(Math.random() * 1E9) + ext);
     }
 });
-const upload = multer({ storage });
+const upload = multer({
+    storage,
+    limits: { fileSize: 8 * 1024 * 1024, files: 50 },
+    fileFilter: (req, file, cb) => {
+        if (!ALLOWED_UPLOAD_MIMES.has(file.mimetype)) {
+            return cb(new Error('Tipo de arquivo nao permitido.'));
+        }
+        cb(null, true);
+    }
+});
 
 // Automação de Migração de Schema (Garantindo novos campos)
 async function setupDB() {
@@ -56,12 +235,14 @@ async function setupDB() {
             'site_menu TEXT',
             'home_hero_card_title VARCHAR(255)', 'home_hero_card_subtitle VARCHAR(255)', 'home_about_button_text VARCHAR(100)', 'home_services_button_text VARCHAR(100)',
             'about_story_image VARCHAR(255)', 'social_links TEXT', 'about_story_lead TEXT', 'about_guidelines_title VARCHAR(255)', 'about_guidelines_text TEXT',
-            'benefits_items TEXT', 'benefits_template VARCHAR(50)', 'benefits_color VARCHAR(50)',
+            'benefits_items TEXT', 'benefits_template VARCHAR(50)', 'benefits_color VARCHAR(50)', 'benefits_card_title_color VARCHAR(50)', 'benefits_card_text_color VARCHAR(50)', 'benefits_card_bg VARCHAR(50)',
             'hero_overlay_color VARCHAR(50) DEFAULT "#0A1128"', 'hero_overlay_opacity DECIMAL(3,2) DEFAULT 0.40',
+            'contact_section_title VARCHAR(255)', 'contact_section_subtitle TEXT',
             'contact_phone VARCHAR(50)', 'contact_email VARCHAR(255)', 'address_full TEXT', 'contact_map_url TEXT',
             'contact_form_title VARCHAR(255)', 'contact_form_recipient VARCHAR(255)',
             'license_qr_code VARCHAR(255)', 'license_nf_data TEXT',
             'license_pdf VARCHAR(255)', 'license_auth_code VARCHAR(255)',
+            'template_version VARCHAR(50) DEFAULT "1.0.0"',
             'admin_primary_color VARCHAR(20) DEFAULT "#0A1128"', 'admin_accent_color VARCHAR(20) DEFAULT "#D62828"', 
             'admin_logo VARCHAR(255)', 'admin_header_logo VARCHAR(255)',
             'login_bg_color VARCHAR(20) DEFAULT "#0A1128"', 'login_card_bg VARCHAR(20) DEFAULT "#FFFFFF"', 
@@ -110,6 +291,21 @@ async function setupDB() {
                 foto VARCHAR(255),
                 aprovado BOOLEAN DEFAULT FALSE,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        await pool.execute(`
+            CREATE TABLE IF NOT EXISTS google_reviews (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                review_id VARCHAR(255) UNIQUE NOT NULL,
+                author_name VARCHAR(255),
+                profile_photo_url VARCHAR(512),
+                rating INT DEFAULT 5,
+                comment TEXT,
+                review_url VARCHAR(512),
+                review_time DATETIME NULL,
+                ativo BOOLEAN DEFAULT TRUE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
         await pool.execute(`
@@ -274,22 +470,24 @@ const app = express();
 
 // Security and Parsers
 app.use(helmet({ contentSecurityPolicy: false }));
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(express.json({ limit: '5mb' }));
+app.use(express.urlencoded({ extended: true, limit: '5mb' }));
+app.locals.assetVersion = ASSET_VERSION;
 
 // EJS Config
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'), {
+    maxAge: process.env.NODE_ENV === 'production' ? '7d' : 0,
+    etag: true,
+    lastModified: true
+}));
 
 // MIDDLEWARE DE GOVERNANÇA DE NAVEGAÇÃO (ESTADO ATIVO DOS MENUS)
 app.use((req, res, next) => {
     const path = req.path;
     if (path === '/') res.locals.currentPage = 'home';
-    else if (path.startsWith('/sobre')) res.locals.currentPage = 'sobre';
-    else if (path.startsWith('/servicos')) res.locals.currentPage = 'servicos';
     else if (path.startsWith('/blog')) res.locals.currentPage = 'blog';
-    else if (path.startsWith('/contato')) res.locals.currentPage = 'contato';
     else if (path.startsWith('/politica')) res.locals.currentPage = 'politica';
     else if (path.startsWith('/termos')) res.locals.currentPage = 'termos';
     else res.locals.currentPage = '';
@@ -311,18 +509,38 @@ app.get('/img/logo-agencia.png', (req, res) => {
 
 // Middleware de Governança de Acesso (RBAC Industrial via JWT Cookie)
 app.use((req, res, next) => {
-    let role = 'admin'; // Fallback seguro
+    let role = null;
+    let isAuthenticated = false;
     try {
-        const cookies = req.headers.cookie ? Object.fromEntries(req.headers.cookie.split('; ').map(c => c.split('='))) : {};
+        const cookies = parseCookies(req.headers.cookie || '');
         const token = cookies.token;
         if (token) {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
             role = decoded.user.nivel || 'admin';
+            req.user = decoded.user;
+            isAuthenticated = true;
         }
     } catch (err) {
-        role = 'admin'; // Erro na decodificação retorna ao nível básico
+        role = null;
+        isAuthenticated = false;
     }
+    
     res.locals.userRole = role;
+    res.locals.isAuthenticated = isAuthenticated;
+    res.locals.assetVersion = ASSET_VERSION;
+
+    // Bloqueio rígido para qualquer rota administrativa (/admin) exceto login
+    if (req.path.startsWith('/admin') && req.path !== '/admin/login') {
+        if (!isAuthenticated) {
+            return res.redirect('/admin/login');
+        }
+    }
+
+    // Se já estiver logado, não há necessidade de ver a tela de login novamente
+    if (req.path === '/admin/login' && isAuthenticated) {
+        return res.redirect('/admin/dashboard');
+    }
+
     next();
 });
 
@@ -376,6 +594,7 @@ app.get('/', async (req, res) => {
     let team = [];
     let testimonials = [];
     let beneficios = [];
+    let testimonialSource = 'manual';
 
     try {
         // Consultar Benefícios
@@ -403,9 +622,31 @@ app.get('/', async (req, res) => {
         [team] = await pool.execute('SELECT * FROM equipe ORDER BY ordem ASC, created_at DESC');
         
         try {
-            [testimonials] = await pool.execute('SELECT * FROM depoimentos WHERE aprovado = TRUE ORDER BY created_at DESC');
+            const [googleReviews] = await pool.execute(`
+                SELECT
+                    id,
+                    author_name AS nome,
+                    '' AS cargo,
+                    'Google Meu Negocio' AS empresa,
+                    comment AS texto,
+                    profile_photo_url AS foto,
+                    rating,
+                    review_url,
+                    review_time,
+                    'google' AS origem
+                FROM google_reviews
+                WHERE ativo = TRUE
+                ORDER BY review_time DESC, updated_at DESC
+                LIMIT 12
+            `);
+            if (googleReviews.length > 0) {
+                testimonials = googleReviews;
+                testimonialSource = 'google';
+            } else {
+                [testimonials] = await pool.execute('SELECT *, NULL AS rating, NULL AS review_url, "manual" AS origem FROM depoimentos WHERE aprovado = TRUE ORDER BY created_at DESC');
+            }
         } catch (err) {
-            [testimonials] = await pool.execute('SELECT * FROM depoimentos ORDER BY created_at DESC');
+            [testimonials] = await pool.execute('SELECT *, NULL AS rating, NULL AS review_url, "manual" AS origem FROM depoimentos ORDER BY created_at DESC');
         }
         
         res.render('index', { 
@@ -416,6 +657,7 @@ app.get('/', async (req, res) => {
             services,
             team,
             testimonials,
+            testimonialSource,
             beneficios
         });
     } catch (e) { 
@@ -424,6 +666,8 @@ app.get('/', async (req, res) => {
     }
 });
 
+/* Public pages removed: sobre, servicos and service detail.
+   These routes are intentionally disabled for the Logistica project.
 app.get('/sobre', async (req, res) => {
     try {
         const [team] = await pool.execute('SELECT * FROM equipe ORDER BY ordem ASC, created_at DESC');
@@ -452,6 +696,7 @@ app.get('/servicos/:slug', async (req, res) => {
         });
     } catch (e) { res.redirect('/servicos'); }
 });
+*/
 
 // ROTA PÚBLICA PARA COLETAR DEPOIMENTOS
 app.get('/colher-depoimento', (req, res) => {
@@ -500,7 +745,7 @@ app.get('/blog/:slug', async (req, res) => {
 });
 
 // Rota de ativação manual de licença
-app.post('/api/licenca/ativar', async (req, res) => {
+app.post('/api/licenca/ativar', requireApiAuth, async (req, res) => {
     const { code } = req.body;
     if (!code) {
         return res.status(400).json({ success: false, error: 'Código de ativação é obrigatório.' });
@@ -585,13 +830,14 @@ app.post('/admin/conteudo', upload.fields([
         'about_story_lead', 'about_guidelines_title', 'about_guidelines_text',
         'social_links', 'benefits_title', 'benefits_text', 'beneficios_json', 
         'hero_overlay_color',
-        'hero_overlay_opacity', 'contact_phone', 'contact_email', 'address_full', 'contact_map_url',
+        'hero_overlay_opacity', 'contact_section_title', 'contact_section_subtitle', 'contact_phone', 'contact_email', 'address_full', 'contact_map_url',
         'contact_form_title', 'contact_form_recipient', 'license_qr_code', 'license_nf_data',
         'license_pdf', 'license_auth_code', 'admin_primary_color', 'admin_accent_color', 'admin_logo', 'admin_header_logo', 'contact_form_fields',
         'login_bg_color', 'login_card_bg', 'login_btn_bg', 'login_btn_text', 'login_label_email', 'login_label_password', 'login_title', 'login_logo',
         'header_strip_text', 'meta_title_home', 'meta_description_home', 'meta_keywords', 'facebook_pixel', 'google_analytics', 'pinterest_pixel', 'linkedin_pixel', 'custom_head_code', 'custom_body_code',
-        'license_expiry_date', 'license_stripe_url', 'license_stripe_payment_code',
-        'font_title', 'font_body', 'color_about_bg', 'color_blog_bg', 'color_blog_text', 'color_contact_bg'
+        'license_expiry_date', 'license_stripe_url', 'license_stripe_payment_code', 'template_version',
+        'font_title', 'font_body', 'color_about_bg', 'color_blog_bg', 'color_blog_text', 'color_contact_bg',
+        'benefits_color', 'benefits_text_color', 'benefits_title_color', 'benefits_icon_bg', 'benefits_icon_color', 'benefits_card_title_color', 'benefits_card_text_color', 'benefits_card_bg'
     ];
 
     // Processar Uploads
@@ -655,7 +901,7 @@ app.post('/admin/conteudo', upload.fields([
     const fields = Object.keys(filteredData);
     console.log('🔍 Campos Finais para SQL:', fields);
     
-    if(fields.length === 0) return res.redirect('/admin/conteudo?success=1');
+    if(fields.length === 0) return res.redirect(cmsRedirect(req, 'success'));
     
     const sets = fields.map(f => `\`${f}\` = ?`).join(', ');
     const values = Object.values(filteredData);
@@ -664,12 +910,10 @@ app.post('/admin/conteudo', upload.fields([
     try {
         sql = `UPDATE configuracoes_globais SET ${sets} WHERE id = 1`;
         await pool.query(sql, values);
-        const activeTab = req.body.active_tab || '';
-        res.redirect(`/admin/conteudo?success=1${activeTab ? '&tab=' + activeTab : ''}`);
+        res.redirect(cmsRedirect(req, 'success'));
     } catch (e) { 
         console.error('❌ CMS UPDATE ERROR:', e);
-        const activeTab = req.body.active_tab || '';
-        res.redirect(`/admin/conteudo?error=1${activeTab ? '&tab=' + activeTab : ''}`);
+        res.redirect(cmsRedirect(req, 'error'));
     }
 });
 
@@ -772,6 +1016,7 @@ app.post('/admin/equipe/delete/:id', async (req, res) => {
     } catch (e) { res.redirect('/admin/equipe?error=1'); }
 });
 
+/* Admin: Especialidades (servicos) removed from admin area for Logistica project.
 app.get('/admin/servicos', async (req, res) => {
     const [services] = await pool.execute('SELECT * FROM servicos ORDER BY created_at DESC');
     res.render('admin/manage-services', { title: 'CMS » Especialidades', services });
@@ -824,11 +1069,14 @@ app.post('/admin/servicos/delete/:id', async (req, res) => {
         res.redirect('/admin/servicos?success=1');
     } catch (e) { res.redirect('/admin/servicos?error=1'); }
 });
-app.get('/contato', (req, res) => res.render('contato', { title: 'Contato | ARQUÊ GESTÃO' }));
+*/
+// app.get('/contato', (req, res) => res.render('contato', { title: 'Contato | ARQUÊ GESTÃO' }));
 app.get('/politica-de-privacidade', (req, res) => res.render('politica', { title: 'Política de Privacidade | ARQUÊ GESTÃO' }));
 app.get('/termos-e-condicoes', (req, res) => res.render('termos', { title: 'Termos e Condições | ARQUÊ GESTÃO' }));
 
 // APIS
+app.use('/api/auth/login', loginRateLimit);
+app.use(['/api/leads', '/api/newsletter', '/api/depoimentos', '/api/comentarios'], publicFormRateLimit);
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/leads', require('./routes/leads'));
 app.use('/api/newsletter', require('./routes/newsletter'));
@@ -985,8 +1233,32 @@ app.post('/admin/comentarios/delete/:id', async (req, res) => {
 app.get('/admin/depoimentos', async (req, res) => {
     try {
         const [depoimentos] = await pool.execute('SELECT * FROM depoimentos ORDER BY created_at DESC');
-        res.render('admin/depoimentos', { title: 'Moderação de Depoimentos', depoimentos });
+        let googleReviews = [];
+        try {
+            [googleReviews] = await pool.execute('SELECT * FROM google_reviews ORDER BY review_time DESC, updated_at DESC LIMIT 50');
+        } catch (e) {
+            googleReviews = [];
+        }
+        res.render('admin/depoimentos', {
+            title: 'Moderação de Depoimentos',
+            depoimentos,
+            googleReviews,
+            googleReviewsConfigured: googleReviewsConfigured(),
+            googleSyncSuccess: req.query.google_sync === 'success',
+            googleSyncError: req.query.google_sync === 'error' ? req.query.message : null,
+            googleSyncSaved: req.query.saved,
+            googleSyncReceived: req.query.received
+        });
     } catch (e) { res.redirect('/admin/dashboard'); }
+});
+app.post('/admin/depoimentos/sync-google', async (req, res) => {
+    try {
+        const result = await syncGoogleReviews();
+        res.redirect(`/admin/depoimentos?google_sync=success&saved=${result.saved}&received=${result.received}`);
+    } catch (e) {
+        console.error('GOOGLE REVIEWS SYNC ERROR:', e.message);
+        res.redirect(`/admin/depoimentos?google_sync=error&message=${encodeURIComponent(e.message)}`);
+    }
 });
 app.post('/admin/depoimentos/aprovar/:id', async (req, res) => {
     await pool.execute('UPDATE depoimentos SET aprovado = TRUE WHERE id = ?', [req.params.id]);
@@ -1003,7 +1275,7 @@ app.get('/depoimentos/novo', (req, res) => {
 });
 app.post('/api/depoimentos', upload.single('foto'), async (req, res) => {
     const { nome, cargo, empresa, texto } = req.body;
-    const foto = req.file ? `/uploads/depoimentos/${req.file.filename}` : null;
+    const foto = req.file ? `/uploads/${req.file.filename}` : null;
     try {
         await pool.execute('INSERT INTO depoimentos (nome, cargo, empresa, texto, foto) VALUES (?, ?, ?, ?, ?)', [nome, cargo, empresa, texto, foto]);
         res.redirect('/depoimentos/novo?success=1');
@@ -1017,6 +1289,20 @@ app.post('/api/comentarios', async (req, res) => {
         await pool.execute('INSERT INTO comentarios (post_id, nome, email, comentario) VALUES (?, ?, ?, ?)', [post_id, nome, email, comentario]);
         res.redirect(`/blog/${post_id}?success=comment`);
     } catch (e) { res.redirect(`/blog/${post_id}?error=comment`); }
+});
+
+app.use((err, req, res, next) => {
+    if (err instanceof multer.MulterError || err.message === 'Tipo de arquivo nao permitido.') {
+        const wantsJson = req.xhr || (req.headers.accept || '').includes('application/json');
+        if (wantsJson) {
+            return res.status(400).json({ msg: err.message });
+        }
+        if (req.originalUrl && req.originalUrl.startsWith('/admin/conteudo')) {
+            return res.redirect(cmsRedirect(req, 'error'));
+        }
+        return res.redirect(`${req.headers.referer || '/'}?error=upload`);
+    }
+    next(err);
 });
 
 const PORT = process.env.PORT || 3000;
