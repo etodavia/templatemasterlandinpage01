@@ -39,7 +39,7 @@
             <img src="<%= settings.admin_logo %>" alt="Admin Logo" style="max-width: 140px; max-height: 50px; object-fit: contain;">
         <% } else { %>
             <h2 style="font-size: 1.15rem; letter-spacing: 3px; font-weight: 900; margin: 0; color: white;">
-                <%= settings.site_name ? settings.site_name.split(' ')[0] : 'ARQUÊ' %>Δ 
+                <%= settings.site_name ? settings.site_name.split(' ')[0] : 'Sua Empresa' %>Δ 
                 <span class="nav-text" style="font-size: 0.6rem; opacity: 0.5; display: block; letter-spacing: 1px; font-weight: 400; margin-top: 5px;">COCKPIT OPERACIONAL</span>
             </h2>
         <% } %>
@@ -47,6 +47,11 @@
     <nav>
         <ul>
             <li>
+                <!-- BLOG REMOVIDO DO MENU (A pedido do usuário)
+                <a href="/admin/posts" class="admin-nav-link <%= (locals.currentPage === 'admin-posts') ? 'active' : '' %>">
+                    <i class="ri-article-line"></i> <span class="nav-text">Blog & Notícias</span>
+                </a>
+                -->
                 <a href="/admin/dashboard" class="<%= (locals.title === 'Dashboard') ? 'active' : '' %>">
                     <i class="ri-dashboard-fill"></i> <span class="nav-text">Dashboard</span>
                 </a>

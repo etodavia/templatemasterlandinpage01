@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | ARQUÊ ADMIN</title>
+    <title>Login | <%= settings.site_name || 'Sistema Admin' %></title>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
@@ -132,7 +132,7 @@
                 <img src="<%= settings.login_logo %>" alt="CMS Logo" style="max-width: 220px; max-height: 75px; object-fit: contain;">
             <% } else { %>
                 <h2 style="color: <%= settings.color_marinho || '#0A1128' %>; margin: 0; font-size: 1.8rem; font-weight: 900; letter-spacing: -1px; display: flex; align-items: center; gap: 12px;">
-                    <i class="ri-pulse-fill" style="color: var(--accent); font-size: 2rem;"></i> <%= settings.login_title || 'ARQUÊΔ CMS' %>
+                    <i class="ri-pulse-fill" style="color: var(--accent); font-size: 2rem;"></i> <%= settings.login_title || 'Sistema CMS' %>
                 </h2>
             <% } %>
         </div>

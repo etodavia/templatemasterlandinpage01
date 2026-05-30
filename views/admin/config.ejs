@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %> | ARQUÊΔ</title>
+    <title><%= title %> | <%= settings.site_name || 'Sistema' %></title>
     <link rel="stylesheet" href="/css/admin.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
@@ -137,7 +137,7 @@
                     <i class="ri-save-3-fill" style="font-size: 3rem; color: var(--admin-marinho); opacity: 0.1; margin-bottom: 20px;"></i>
                     <p style="text-align: center; font-size: 0.9rem; color: #888; margin-bottom: 30px;">Clique no botão abaixo para aplicar todas as mudanças em tempo real no site público.</p>
                     <button type="submit" class="btn-save">SALVAR TODAS AS ALTERAÇÕES</button>
-                    <p style="margin-top: 20px; font-size: 0.75rem; font-weight: 700; color: var(--admin-marinho);">ARQUÊ GESTÃO Admin v<%= settings.template_version || '1.0.0' %></p>
+                    <p style="margin-top: 20px; font-size: 0.75rem; font-weight: 700; color: var(--admin-marinho);">Sua Empresa Admin v<%= settings.template_version || '1.0.0' %></p>
                 </div>
 
             </div>

@@ -209,7 +209,7 @@ async function setupDB() {
         await pool.execute(`
             CREATE TABLE IF NOT EXISTS configuracoes_globais (
                 id INT PRIMARY KEY AUTO_INCREMENT,
-                site_name VARCHAR(100) DEFAULT 'ARQUÊ GESTÃO'
+                site_name VARCHAR(100) DEFAULT 'Sua Empresa'
             )
         `);
         const [rows] = await pool.execute('SELECT id FROM configuracoes_globais WHERE id = 1');
@@ -248,14 +248,15 @@ async function setupDB() {
             'login_bg_color VARCHAR(20) DEFAULT "#0A1128"', 'login_card_bg VARCHAR(20) DEFAULT "#FFFFFF"', 
             'login_btn_bg VARCHAR(20) DEFAULT "#0A1128"', 'login_btn_text VARCHAR(255) DEFAULT "ACESSAR GOVERNANÇA"',
             'login_label_email VARCHAR(255) DEFAULT "Credencial de Acesso"', 'login_label_password VARCHAR(255) DEFAULT "Assinatura de Segurança"',
-            'login_title VARCHAR(255) DEFAULT "ARQUÊΔ CMS"', 'login_logo VARCHAR(255)',
+            'login_title VARCHAR(255) DEFAULT "Sistema CMS"', 'login_logo VARCHAR(255)',
             'contact_form_fields TEXT', 'header_strip_text TEXT', 'beneficios_json TEXT',
             'benefits_icon_bg VARCHAR(50)', 'benefits_icon_color VARCHAR(50)', 'benefits_title_color VARCHAR(50)', 'benefits_text_color VARCHAR(50)',
             'meta_title_home VARCHAR(255)', 'meta_description_home TEXT', 'facebook_pixel TEXT', 'google_analytics TEXT',
             'license_expiry_date VARCHAR(50)', 'license_stripe_url VARCHAR(512)', 'license_stripe_payment_code VARCHAR(255)',
             'font_title VARCHAR(100) DEFAULT "Playfair Display"', 'font_body VARCHAR(100) DEFAULT "Inter Tight"',
             'color_about_bg VARCHAR(20) DEFAULT "#F7F7F4"', 'color_blog_bg VARCHAR(20) DEFAULT "#0A1128"',
-            'color_blog_text VARCHAR(20) DEFAULT "#FFFFFF"', 'color_contact_bg VARCHAR(20) DEFAULT "#F7F7F4"'
+            'color_blog_text VARCHAR(20) DEFAULT "#FFFFFF"', 'color_contact_bg VARCHAR(20) DEFAULT "#F7F7F4"',
+            'admin_tutorial_video VARCHAR(500)', 'admin_tutorial_image VARCHAR(500)'
         ];
         for (const col of columns) {
             try {
@@ -416,7 +417,7 @@ async function setupDB() {
         }
 
         const seedSv = [
-            ['cultura-organizacional', 'Cultura Organizacional', 'Diagnóstico analítico do DNA invisível da sua empresa para alinhar valores e comportamentos reais.', 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800', 'ri-team-line', '<h3>O DNA da sua Empresa</h3><p>A cultura organizacional é o que acontece quando ninguém está olhando. Na ARQUÊ, ajudamos você a mapear os valores reais versus os valores desejados, criando um ambiente que atrai talentos.</p>'],
+            ['cultura-organizacional', 'Cultura Organizacional', 'Diagnóstico analítico do DNA invisível da sua empresa para alinhar valores e comportamentos reais.', 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800', 'ri-team-line', '<h3>O DNA da sua Empresa</h3><p>A cultura organizacional é o que acontece quando ninguém está olhando. Na Sua Empresa, ajudamos você a mapear os valores reais versus os valores desejados, criando um ambiente que atrai talentos.</p>'],
             ['mentoria-de-lideranca', 'Mentoria de Liderança', 'Capacitação estratégica para gestores transformarem potencial em resultados exponenciais.', 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&q=80&w=800', 'ri-focus-3-line', '<h3>Líderes que Inspiram</h3><p>Liderança não é cargo, é impacto. Nossa mentoria foca em competências comportamentais e inteligência emocional para que seu time atue como verdadeiros parceiros do negócio.</p>'],
             ['gestao-de-processos-rh', 'Gestão de Processos de RH', 'Recrutamento técnico e estruturação de fluxos operacionais com foco em eficiência máxima.', 'https://images.unsplash.com/photo-1507679793137-c72a09c17e64?auto=format&fit=crop&q=80&w=800', 'ri-node-tree', '<h3>Eficiência em cada Contratação</h3><p>Otimizamos todo o ciclo do colaborador, do onboarding ao offboarding. Processos claros reduzem custos e aumentam a clareza para todos os envolvidos.</p>']
         ];
@@ -650,7 +651,7 @@ app.get('/', async (req, res) => {
         }
         
         res.render('index', { 
-            title: res.locals.settings?.meta_title_home || 'ARQUÊ GESTÃO | Consultoria Estratégica e Capital Humano', 
+            title: res.locals.settings?.meta_title_home || 'Sua Empresa | Consultoria Estratégica e Capital Humano', 
             description: res.locals.settings?.meta_description_home || 'Especialistas em impulsionar o capital humano e elevar a performance operacional com visão sistêmica e resultados exponenciais.',
             keywords: res.locals.settings?.meta_keywords || 'gestão, consultoria, rh, capital humano, performance, arquê gestão',
             posts,
@@ -662,7 +663,7 @@ app.get('/', async (req, res) => {
         });
     } catch (e) { 
         console.error('❌ CRITICAL HOME ROUTE ERROR:', e);
-        res.render('index', { title: 'Home | ARQUÊ', posts: [], services: [], team: [], testimonials: [], beneficios: [] }); 
+        res.render('index', { title: 'Home | Sua Empresa', posts: [], services: [], team: [], testimonials: [], beneficios: [] }); 
     }
 });
 
@@ -671,15 +672,15 @@ app.get('/', async (req, res) => {
 app.get('/sobre', async (req, res) => {
     try {
         const [team] = await pool.execute('SELECT * FROM equipe ORDER BY ordem ASC, created_at DESC');
-        res.render('sobre', { title: 'Sobre | ARQUÊ GESTÃO', team });
-    } catch (e) { res.render('sobre', { title: 'Sobre | ARQUÊ GESTÃO', team: [] }); }
+        res.render('sobre', { title: 'Sobre | Sua Empresa', team });
+    } catch (e) { res.render('sobre', { title: 'Sobre | Sua Empresa', team: [] }); }
 });
 
 app.get('/servicos', async (req, res) => {
     try {
         const [services] = await pool.execute('SELECT * FROM servicos WHERE ativo = 1 ORDER BY ordem ASC, titulo ASC');
-        res.render('servicos', { title: 'Serviços | ARQUÊ GESTÃO', services });
-    } catch (e) { res.render('servicos', { title: 'Serviços | ARQUÊ', services: [] }); }
+        res.render('servicos', { title: 'Serviços | Sua Empresa', services });
+    } catch (e) { res.render('servicos', { title: 'Serviços | Sua Empresa', services: [] }); }
 });
 
 app.get('/servicos/:slug', async (req, res) => {
@@ -689,7 +690,7 @@ app.get('/servicos/:slug', async (req, res) => {
         if (!service) return res.redirect('/servicos');
         const [comments] = await pool.execute('SELECT * FROM comentarios WHERE post_id = ? AND aprovado = TRUE', [req.params.slug]);
         res.render('service-detail', { 
-            title: service.meta_title || `${service.titulo} | ARQUÊ GESTÃO`, 
+            title: service.meta_title || `${service.titulo} | Sua Empresa`, 
             description: service.meta_description || service.resumo,
             service, 
             comments 
@@ -723,8 +724,8 @@ app.post('/api/public-depoimento', upload.single('foto_file'), async (req, res) 
 app.get('/blog', async (req, res) => {
     try {
         const [posts] = await pool.execute('SELECT * FROM posts WHERE ativo = 1 ORDER BY created_at DESC');
-        res.render('blog', { title: 'Blog | ARQUÊ GESTÃO', posts });
-    } catch (e) { res.render('blog', { title: 'Blog | ARQUÊ', posts: [] }); }
+        res.render('blog', { title: 'Blog | Sua Empresa', posts });
+    } catch (e) { res.render('blog', { title: 'Blog | Sua Empresa', posts: [] }); }
 });
 
 app.get('/blog/:slug', async (req, res) => {
@@ -734,7 +735,7 @@ app.get('/blog/:slug', async (req, res) => {
         if (!post) return res.redirect('/blog');
         const [comments] = await pool.execute('SELECT * FROM comentarios WHERE post_id = ? AND aprovado = TRUE ORDER BY created_at DESC', [req.params.slug]);
         res.render('post', { 
-            title: post.meta_title || `${post.titulo} | ARQUÊ GESTÃO`, 
+            title: post.meta_title || `${post.titulo} | Sua Empresa`, 
             description: post.meta_description || post.resumo,
             post, 
             comments,
@@ -807,7 +808,8 @@ app.post('/admin/conteudo', upload.fields([
     { name: 'license_pdf_file', maxCount: 1 },
     { name: 'admin_logo_file', maxCount: 1 },
     { name: 'admin_header_logo_file', maxCount: 1 },
-    { name: 'login_logo_file', maxCount: 1 }
+    { name: 'login_logo_file', maxCount: 1 },
+    { name: 'admin_tutorial_image_file', maxCount: 1 }
 ]), async (req, res) => {
     let updateData = { ...req.body };
     console.log('📥 REQ.BODY COMPLETO:', Object.keys(req.body));
@@ -837,7 +839,8 @@ app.post('/admin/conteudo', upload.fields([
         'header_strip_text', 'meta_title_home', 'meta_description_home', 'meta_keywords', 'facebook_pixel', 'google_analytics', 'pinterest_pixel', 'linkedin_pixel', 'custom_head_code', 'custom_body_code',
         'license_expiry_date', 'license_stripe_url', 'license_stripe_payment_code', 'template_version',
         'font_title', 'font_body', 'color_about_bg', 'color_blog_bg', 'color_blog_text', 'color_contact_bg',
-        'benefits_color', 'benefits_text_color', 'benefits_title_color', 'benefits_icon_bg', 'benefits_icon_color', 'benefits_card_title_color', 'benefits_card_text_color', 'benefits_card_bg'
+        'benefits_color', 'benefits_text_color', 'benefits_title_color', 'benefits_icon_bg', 'benefits_icon_color', 'benefits_card_title_color', 'benefits_card_text_color', 'benefits_card_bg',
+        'admin_tutorial_video', 'admin_tutorial_image'
     ];
 
     // Processar Uploads
@@ -846,7 +849,7 @@ app.post('/admin/conteudo', upload.fields([
         'services_hero_image', 'blog_hero_image', 'contact_hero_image',
         'about_story_image', 'logo', 'logo_white', 'favicon', 
         'license_qr_code', 'license_pdf', 'admin_logo', 'admin_header_logo',
-        'login_logo'
+        'login_logo', 'admin_tutorial_image'
     ];
 
     fileFields.forEach(field => {
@@ -1070,9 +1073,9 @@ app.post('/admin/servicos/delete/:id', async (req, res) => {
     } catch (e) { res.redirect('/admin/servicos?error=1'); }
 });
 */
-// app.get('/contato', (req, res) => res.render('contato', { title: 'Contato | ARQUÊ GESTÃO' }));
-app.get('/politica-de-privacidade', (req, res) => res.render('politica', { title: 'Política de Privacidade | ARQUÊ GESTÃO' }));
-app.get('/termos-e-condicoes', (req, res) => res.render('termos', { title: 'Termos e Condições | ARQUÊ GESTÃO' }));
+// app.get('/contato', (req, res) => res.render('contato', { title: 'Contato | Sua Empresa' }));
+app.get('/politica-de-privacidade', (req, res) => res.render('politica', { title: 'Política de Privacidade | Sua Empresa' }));
+app.get('/termos-e-condicoes', (req, res) => res.render('termos', { title: 'Termos e Condições | Sua Empresa' }));
 
 // APIS
 app.use('/api/auth/login', loginRateLimit);
@@ -1271,7 +1274,7 @@ app.post('/admin/depoimentos/delete/:id', async (req, res) => {
 
 // FORMULÁRIO EXTERNO DE DEPOIMENTOS (PÚBLICO)
 app.get('/depoimentos/novo', (req, res) => {
-    res.render('form-depoimento', { title: 'Enviar Depoimento | ARQUÊ GESTÃO' });
+    res.render('form-depoimento', { title: 'Enviar Depoimento | Sua Empresa' });
 });
 app.post('/api/depoimentos', upload.single('foto'), async (req, res) => {
     const { nome, cargo, empresa, texto } = req.body;
@@ -1306,4 +1309,4 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', () => console.log(`🚀 ARQUÊΔ SISTEMA ON: Porta ${PORT}`));
+app.listen(PORT, '0.0.0.0', () => console.log(`🚀 Sistema SISTEMA ON: Porta ${PORT}`));

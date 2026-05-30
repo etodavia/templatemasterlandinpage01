@@ -56,23 +56,22 @@
     <header>
         <a href="/" class="logo">
             <% if (settings.logo) { %>
-                <img src="<%= settings.logo %>" alt="ARQUÊΔ" class="logo-main" style="max-height: 40px;">
+                <img src="<%= settings.logo %>" alt="Sistema" class="logo-main" style="max-height: 40px;">
                 <% if (settings.logo_white) { %>
-                    <img src="<%= settings.logo_white %>" alt="ARQUÊΔ" class="logo-white" style="display: none; max-height: 40px;">
+                    <img src="<%= settings.logo_white %>" alt="Sistema" class="logo-white" style="display: none; max-height: 40px;">
                 <% } %>
             <% } else { %>
-                ARQUÊΔ
+                Sistema
             <% } %>
         </a>
         <nav>
             <ul class="desktop-menu">
                 <% 
                    let menu = [
-                       { label: 'Home', link: '/' },
-                       { label: 'Sobre', link: '/sobre' },
-                       { label: 'Serviços', link: '/servicos' },
-                       { label: 'Blog', link: '/blog' },
-                       { label: 'Contato', link: '/contato' }
+                       { label: 'Home', link: '/#home' },
+                       { label: 'Sobre', link: '/#sobre' },
+                       { label: 'Serviços', link: '/#servicos' },
+                       { label: 'Contato', link: '/#contato' }
                    ];
                    if (settings.site_menu && settings.site_menu.trim() !== '') {
                        menu = settings.site_menu.split('\n').filter(line => line.includes('|')).map(line => {

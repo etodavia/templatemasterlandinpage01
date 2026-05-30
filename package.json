@@ -1,7 +1,7 @@
 {
   "name": "arque-gestao",
   "version": "1.0.0",
-  "description": "Plataforma Institucional ARQUÊ GESTÃO",
+  "description": "Plataforma Institucional Sua Empresa",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

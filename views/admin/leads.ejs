@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %> | ARQUÊΔ</title>
+    <title><%= title %> | <%= settings.site_name || 'Sistema' %></title>
     <link rel="stylesheet" href="/css/admin.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
@@ -55,8 +55,8 @@
                                                 </td>
                                                 <td style="text-align: right;">
                                                     <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                                                        <a href="mailto:<%= lead.email %>?subject=Contato ARQUÊ GESTÃO&body=Olá <%= lead.nome %>," class="btn-action" style="background: #e0f2fe; color: #0284c7; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none;" title="Responder"><i class="ri-mail-line"></i></a>
-                                                        <a href="https://wa.me/55<%= lead.telefone.replace(/\D/g,'') %>?text=Olá%20<%= encodeURIComponent(lead.nome) %>%2C%20vi%20seu%20contato%20no%20site%20da%20ARQUÊ%20GESTÃO." target="_blank" class="btn-action" style="background: #dcfce7; color: #16a34a; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none;" title="WhatsApp"><i class="ri-whatsapp-line"></i></a>
+                                                        <a href="mailto:<%= lead.email %>?subject=Contato Sua Empresa&body=Olá <%= lead.nome %>," class="btn-action" style="background: #e0f2fe; color: #0284c7; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none;" title="Responder"><i class="ri-mail-line"></i></a>
+                                                        <a href="https://wa.me/55<%= lead.telefone.replace(/\D/g,'') %>?text=Olá%20<%= encodeURIComponent(lead.nome) %>%2C%20vi%20seu%20contato%20no%20site%20da%20Sua Empresa%20GESTÃO." target="_blank" class="btn-action" style="background: #dcfce7; color: #16a34a; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none;" title="WhatsApp"><i class="ri-whatsapp-line"></i></a>
                                                         <form action="/admin/leads/delete/<%= lead.id %>" method="POST" onsubmit="return confirm('Excluir este lead permanentemente?');" style="display: inline;">
                                                             <button type="submit" class="btn-action" style="background: #fff1f2; color: #e11d48; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer;" title="Remover"><i class="ri-delete-bin-line"></i></button>
                                                         </form>

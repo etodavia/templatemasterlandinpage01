@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %> | ARQUÊΔ</title>
+    <title><%= title %> | <%= settings.site_name || 'Sistema' %></title>
     <link rel="stylesheet" href="/css/admin.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <style>
@@ -140,6 +140,11 @@
                 <div id="tab-identidade" class="tab-panel <%= (locals.userRole !== 'superadmin') ? 'active' : '' %>">
                     <div class="section-header"><h3>Identidade Corporativa</h3></div>
                     <div class="form-grid">
+                        <div class="form-group full">
+                            <label>Nome do Sistema / Título do Site</label>
+                            <input type="text" name="site_name" value="<%= settings.site_name || 'Sua Empresa' %>">
+                            <p class="field-note"><i class="ri-text"></i> Nome que aparece na aba do navegador ao lado do favicon (SEO e Identidade).</p>
+                        </div>
                         <div class="form-group">
                             <label>Logo Principal (Colorida)</label>
                             <input type="file" name="logo_file" accept="image/*">
@@ -265,11 +270,7 @@
                     </div>
                     <div class="form-group full">
                         <label>Estrutura do Menu (Um por linha: RÓTULO|LINK)</label>
-                        <textarea name="site_menu" placeholder="Home|/
-Sobre|/sobre
-Serviços|/servicos
-Blog|/blog
-Contato|/contato"><%= settings.site_menu %></textarea>
+                            <textarea name="site_menu" rows="6" placeholder="Home | /#home\nSobre | /#sobre\nServiços | /#servicos\nContato | /#contato"><%= settings.site_name ? settings.site_menu : '' %></textarea>
                         <p style="font-size: 0.65rem; color: #999; margin-top: 5px;">Use o formato: Nome|/link. Ex: Contato|/contato</p>
                     </div>
                 </div>
@@ -574,7 +575,7 @@ Contato|/contato"><%= settings.site_menu %></textarea>
 
 
                 <div id="tab-page-sobre" class="tab-panel">
-                    <div class="section-header"><h3>Página: Sobre a ARQUÊΔ</h3></div>
+                    <div class="section-header"><h3>Página: Sobre a Sistema</h3></div>
                     <div class="form-grid">
                         <div class="form-group full">
                             <label>Hero: Título Principal</label>
@@ -781,7 +782,7 @@ Contato|/contato"><%= settings.site_menu %></textarea>
                     </div>
                     <div class="form-grid">
                         <div class="form-group full" style="background: rgba(214, 40, 40, 0.05); padding: 25px; border-radius: 12px; border-left: 5px solid var(--accent);">
-                            <p style="font-size: 0.85rem; color: var(--primary); font-weight: 700; margin-bottom: 20px;">Esta seção é destinada à autenticidade da sua licença ARQUÊΔ. Os dados inseridos aqui serão exibidos exclusivamente no seu Cockpit de Inteligência (Dashboard).</p>
+                            <p style="font-size: 0.85rem; color: var(--primary); font-weight: 700; margin-bottom: 20px;">Esta seção é destinada à autenticidade da sua licença Sistema. Os dados inseridos aqui serão exibidos exclusivamente no seu Cockpit de Inteligência (Dashboard).</p>
                             
                             <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 30px; align-items: start;">
                                 <div class="form-group">
@@ -851,6 +852,22 @@ Contato|/contato"><%= settings.site_menu %></textarea>
                                     <p class="field-note" style="margin-top: 10px;"><i class="ri-stripe-line"></i> Cole aqui o ID de pagamento após a renovação.</p>
                                 </div>
                             </div>
+                            
+                            <div style="margin-top: 20px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                                <div class="form-group">
+                                    <label>Capa do Vídeo (Imagem JPG/PNG)</label>
+                                    <input type="file" name="admin_tutorial_image_file" accept="image/*">
+                                    <input type="hidden" name="admin_tutorial_image" value="<%= settings.admin_tutorial_image %>">
+                                    <% if (settings.admin_tutorial_image) { %> 
+                                        <img src="<%= settings.admin_tutorial_image %>" class="img-preview" style="width: 100%; height: auto; border-radius: 12px; margin-top: 10px;"> 
+                                    <% } %>
+                                </div>
+                                <div class="form-group">
+                                    <label>Link Externo do Vídeo (YouTube/Vimeo/etc)</label>
+                                    <input type="text" name="admin_tutorial_video" value="<%= settings.admin_tutorial_video || '' %>" placeholder="Ex: https://youtu.be/..." style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ddd; outline: none; font-size: 0.9rem; font-weight: 600; color: var(--primary);">
+                                    <p class="field-note" style="margin-top: 10px;"><i class="ri-external-link-line"></i> Cole o link do vídeo. O cliente clicará na imagem da capa para assistir ao vídeo em uma nova aba.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -871,7 +888,7 @@ Contato|/contato"><%= settings.site_menu %></textarea>
 
                         <div class="form-group">
                             <label>Título Superior de Login</label>
-                            <input type="text" name="login_title" value="<%= settings.login_title || 'ARQUÊΔ CMS' %>" placeholder="Ex: ARQUÊΔ CMS">
+                            <input type="text" name="login_title" value="<%= settings.login_title || 'Sistema CMS' %>" placeholder="Ex: Sistema CMS">
                         </div>
 
                         <div class="form-group">

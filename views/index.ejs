@@ -29,7 +29,7 @@
 
     <main>
         <!-- HERO IMPACTO -->
-        <section class="hero">
+        <section id="home" class="hero">
             <div class="hero-content">
                 <h1 data-reveal>
                     <%- settings.home_hero_title || 'Lidere Negócios com <em>Confiança</em>.' %>
@@ -50,7 +50,7 @@
         </section>
 
         <!-- SOBRE (DINÂMICO) -->
-        <section style="background: var(--bg-about); padding: 100px 0;">
+        <section id="sobre" style="background: var(--bg-about); padding: 100px 0;">
             <div class="container">
                 <div class="about-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;">
                     <div data-reveal="left">
@@ -62,7 +62,7 @@
                             <%= settings.about_text || 'Na Arque Gestão, acreditamos que a cultura organizacional é o verdadeiro motor da inovação. Nossa abordagem sistêmica conecta os pontos invisíveis que transformam ambientes de trabalho em centros de excelência.' %>
                         </p>
                         <a href="/sobre" class="btn-pill-large" style="background: var(--navy-blue); color: white;">
-                            <%= settings.home_about_button_text || 'Conhecer a ARQUÊΔ' %> <div class="icon-blue-circle" style="background: white; color: var(--navy-blue);"><i class="ri-arrow-right-line"></i></div>
+                            <%= settings.home_about_button_text || 'Conhecer a Sistema' %> <div class="icon-blue-circle" style="background: white; color: var(--navy-blue);"><i class="ri-arrow-right-line"></i></div>
                         </a>
                     </div>
                     <div data-reveal="right" class="about-image-wrapper">
@@ -257,7 +257,7 @@
         </section>
 
         <!-- CONTATO HOME -->
-        <section style="background: var(--bg-contact); padding: 100px 0;">
+        <section id="contato" style="background: var(--bg-contact); padding: 100px 0;">
             <div class="container">
                 <div style="text-align: center; margin-bottom: 60px;" data-reveal>
                     <span class="section-label">Fale Conosco</span>

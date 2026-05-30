@@ -4,11 +4,11 @@
             <div class="footer-column">
                 <a href="/" class="footer-logo">
                     <% if (settings.logo_white) { %>
-                        <img src="<%= settings.logo_white %>" alt="ARQUÊΔ" style="max-height: 40px;">
+                        <img src="<%= settings.logo_white %>" alt="Sistema" style="max-height: 40px;">
                     <% } else if (settings.logo) { %>
-                        <img src="<%= settings.logo %>" alt="ARQUÊΔ" style="max-height: 40px;">
+                        <img src="<%= settings.logo %>" alt="Sistema" style="max-height: 40px;">
                     <% } else { %>
-                        ARQUÊΔ
+                        Sistema
                     <% } %>
                 </a>
                 <p style="opacity: 0.5; font-size: 0.85rem; margin-top: 1rem; max-width: 280px; line-height: 1.6;">
@@ -28,9 +28,10 @@
             <div class="footer-column footer-links">
                 <h4>Navegação</h4>
                 <ul>
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/blog">Blog</a></li>
-                    <li><a href="/contato">Contato</a></li>
+                    <li><a href="/#home">Home</a></li>
+                    <li><a href="/#sobre">Sobre</a></li>
+                    <li><a href="/#servicos">Serviços</a></li>
+                    <li><a href="/#contato">Contato</a></li>
                 </ul>
             </div>
 
@@ -66,7 +67,7 @@
         <div class="footer-bottom">
             <div style="opacity: 0.7;">
                 <% if (settings.cnpj) { %>CNPJ: <%= settings.cnpj %> | <% } %>
-                <%= settings.site_name || 'ARQUÊ GESTÃO' %> <%= new Date().getFullYear() %> | <%= settings.footer_text || 'Todos os direitos reservados.' %>
+                <%= settings.site_name || 'Sua Empresa' %> <%= new Date().getFullYear() %> | <%= settings.footer_text || 'Todos os direitos reservados.' %>
             </div>
             <div style="opacity: 0.5; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;">
                 <a href="https://agenciaetodavia.com.br" target="_blank" style="color: inherit; text-decoration: none; display: flex; align-items: center; gap: 6px;">
@@ -87,15 +88,11 @@
 
 <!-- NAVEGAÇÃO FLUTUANTE BOTTOM (MOBILE/TABLET) -->
 <div class="m-floating-nav">
-    <a href="/servicos" class="m-nav-item <%= (locals.currentPage === 'servicos') ? 'active' : '' %>">
-        <i class="ri-briefcase-4-fill"></i>
+    <a href="/#servicos" class="m-nav-item <%= (locals.currentPage === 'servicos') ? 'active' : '' %>">
+        <i class="ri-briefcase-4-line"></i>
         <span>Serviços</span>
     </a>
-    <a href="/blog" class="m-nav-item <%= (locals.currentPage === 'blog') ? 'active' : '' %>">
-        <i class="ri-article-fill"></i>
-        <span>Blog</span>
-    </a>
-    <a href="/contato" class="m-nav-item <%= (locals.currentPage === 'contato') ? 'active' : '' %>">
+    <a href="/#contato" class="m-nav-item <%= (locals.currentPage === 'contato') ? 'active' : '' %>">
         <i class="ri-chat-3-fill"></i>
         <span>Contato</span>
     </a>

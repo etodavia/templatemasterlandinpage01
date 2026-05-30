@@ -42,7 +42,7 @@
                 <h5 style="margin: 0; font-size: 0.75rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: white;"><%= expired ? '🚨 LICENÇA EXPIRADA' : '⏳ AVISO DE MANUTENÇÃO & SUPORTE' %></h5>
                 <p style="margin: 2px 0 0; font-size: 0.7rem; opacity: 0.9; font-weight: 500; color: #f1f5f9;">
                     <% if (expired) { %>
-                        A licença anual do seu ecossistema ARQUÊΔ expirou em <strong><%= formattedDateStr %></strong>. Entre em contato com a <strong>E-TODAVIA</strong> para regularizar.
+                        A licença anual do seu ecossistema Sistema expirou em <strong><%= formattedDateStr %></strong>. Entre em contato com a <strong>E-TODAVIA</strong> para regularizar.
                     <% } else { %>
                         A licença anual do seu ecossistema vence dia <strong><%= formattedDateStr %></strong> (restam apenas <strong><%= daysDiff %> dias</strong> para garantir suporte ativo).
                     <% } %>
@@ -183,7 +183,7 @@
                 <% if (settings.admin_header_logo) { %>
                     <img src="<%= settings.admin_header_logo %>" alt="Logo" style="max-height: 35px; object-fit: contain;">
                 <% } else { %>
-                    <%= settings.site_name ? settings.site_name.split(' ')[0] : 'ARQUÊ' %>Δ
+                    <%= settings.site_name ? settings.site_name.split(' ')[0] : 'Sua Empresa' %>Δ
                 <% } %>
                 <span class="desktop-only" style="opacity: 0.3; font-weight: 400; font-size: 0.7rem; letter-spacing: 1px;">COCKPIT 360°</span>
             </h1>

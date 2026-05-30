@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %> | ARQUÊΔ</title>
+    <title><%= title %> | <%= settings.site_name || 'Sistema' %></title>
     <link rel="stylesheet" href="/css/admin.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
@@ -21,7 +21,7 @@
                         <header style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center;">
                             <div>
                                 <h2 style="font-size: 2rem; color: #0A1128; margin: 0;"><%= service ? 'Refinar' : 'Arquitetar' %> Solução <em>Estratégica</em></h2>
-                                <p style="color: #888; font-size: 0.9rem; margin-top: 5px;">Expanda o portfólio de autoridade da ARQUÊΔ com precisão tática.</p>
+                                <p style="color: #888; font-size: 0.9rem; margin-top: 5px;">Expanda o portfólio de autoridade da Sistema com precisão tática.</p>
                             </div>
                             <a href="/admin/servicos" style="text-decoration: none; color: #666; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; gap: 5px;">
                                 <i class="ri-arrow-left-line"></i> VOLTAR
