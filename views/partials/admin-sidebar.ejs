@@ -81,7 +81,12 @@
                 </a>
             </li>
 
-            <!-- Especialidades, Blog e Equipe removidos do projeto Landing Page -->
+            <li>
+                <a href="/admin/servicos" class="<%= (locals.title && (locals.title.includes('Especialidade') || locals.title.includes('Serviço'))) ? 'active' : '' %>">
+                    <i class="ri-briefcase-line"></i> <span class="nav-text">Serviços</span>
+                </a>
+            </li>
+            <!-- Blog e Equipe removidos do projeto Landing Page -->
             <!-- Editor de Form removed for Logistica project -->
             <li style="margin-bottom: 2rem">
                 <a href="/admin/perfil" class="<%= (locals.title === 'Meu Perfil') ? 'active' : '' %>">

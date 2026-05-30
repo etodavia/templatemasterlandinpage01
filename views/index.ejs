@@ -38,7 +38,7 @@
                     <%- settings.home_hero_description || 'Consultoria estratégica especializada em impulsionar o capital humano e elevar a performance operacional.' %>
                 </p>
                 <div data-reveal style="display: flex; justify-content: flex-start;">
-                    <a href="https://wa.me/<%= settings.whatsapp %>" class="btn-pill-large" style="width: auto !important; min-width: 200px; padding: 18px 30px;">
+                    <a href="https://wa.me/<%= settings.whatsapp %>" class="btn-pill-large btn-whatsapp-conversion" style="width: auto !important; min-width: 200px; padding: 18px 30px;">
                         Agendar Consultoria <div class="icon-blue-circle" style="background: var(--accent-red); color: white;"><i class="ri-arrow-right-up-line"></i></div>
                     </a>
                 </div>
@@ -79,16 +79,7 @@
                 .section-header-flex { flex-direction: column; align-items: flex-start !important; gap: 20px; }
             }
             .servicesSwiper { padding-bottom: 40px; }
-            @media (min-width: 1024px) {
-                .servicesSwiper .services-wrapper-mobile {
-                    display: grid !important;
-                    grid-template-columns: repeat(3, 1fr) !important;
-                    gap: 25px !important;
-                }
-                .servicesSwiper .services-slide { width: auto !important; height: auto !important; margin-right: 0 !important; }
-                .services-pagination { display: none; }
-                .servicesSwiper { padding-bottom: 0; overflow: visible; }
-            }
+            .servicesSwiper .swiper-slide { height: auto !important; }
         </style>
         <section id="servicos" style="background: var(--bg-sand); padding: 60px 0;">
             <div class="container">
@@ -100,21 +91,21 @@
                         </h2>
                         <p style="color: var(--text-color); max-width: 500px;"><%= settings.services_section_text %></p>
                     </div>
-                    <a href="/servicos" data-reveal="right" class="btn-cta-header" style="background: var(--navy-blue); padding: 16px 30px; border-radius: 12px; font-size: 0.9rem;">
-                        <%= settings.home_services_button_text || 'Ver todos os serviços' %>
-                    </a>
                 </div>
                 <div class="swiper servicesSwiper" style="overflow: hidden;">
                     <div class="swiper-wrapper services-wrapper-mobile">
                         <% if (locals.services) { %>
-                            <% locals.services.slice(0,3).forEach(s => { %>
+                            <% locals.services.forEach(s => { %>
                                 <div class="swiper-slide services-slide">
                                     <div style="background: var(--bg-header); border-radius: 20px; padding: 35px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); height: 100%; display: flex; flex-direction: column;" data-reveal="up">
                                         <div style="width: 55px; height: 55px; background: rgba(0,0,0,0.03); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
                                             <i class="<%= s.icone %>" style="font-size: 1.8rem; color: var(--navy-blue);"></i>
                                         </div>
                                         <h3 style="font-size: 1.4rem; margin-bottom: 15px; color: var(--navy-blue);"><%= s.titulo %></h3>
-                                        <p style="color: var(--text-color); font-size: 0.9rem; line-height: 1.6;"><%= s.resumo %></p>
+                                        <p style="color: var(--text-color); font-size: 0.9rem; line-height: 1.6; margin-bottom: auto;"><%= s.resumo %></p>
+                                        <a href="https://wa.me/<%= settings.whatsapp ? settings.whatsapp.replace(/\D/g, '') : '' %>?text=Olá,%20tenho%20interesse%20no%20serviço%20<%= encodeURIComponent(s.titulo) %>" target="_blank" class="btn-whatsapp-conversion" style="margin-top: 15px; display: inline-flex; align-items: center; gap: 5px; color: var(--navy-blue); font-weight: 600; text-decoration: none; font-size: 0.9rem;">
+                                            Estou interessado <i class="ri-whatsapp-line"></i>
+                                        </a>
                                     </div>
                                 </div>
                             <% }) %>
@@ -359,15 +350,15 @@
             }
         });
 
-        // Services Swiper (Mobile/Tablet Only)
+        // Services Swiper (Mobile/Tablet/Desktop)
         const servicesSwiper = new Swiper('.servicesSwiper', {
-            slidesPerView: 1.2,
+            slidesPerView: 1,
             spaceBetween: 20,
             centeredSlides: false,
             pagination: { el: ".services-pagination", clickable: true },
             breakpoints: {
-                768: { slidesPerView: 2.2 },
-                1024: { enabled: false } // Desativar carrossel no desktop (usar grid)
+                768: { slidesPerView: 2 },
+                1024: { slidesPerView: 4 }
             }
         });
 

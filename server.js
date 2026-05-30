@@ -1019,7 +1019,7 @@ app.post('/admin/equipe/delete/:id', async (req, res) => {
     } catch (e) { res.redirect('/admin/equipe?error=1'); }
 });
 
-/* Admin: Especialidades (servicos) removed from admin area for Logistica project.
+// Admin: Especialidades (servicos) reativado para o projeto
 app.get('/admin/servicos', async (req, res) => {
     const [services] = await pool.execute('SELECT * FROM servicos ORDER BY created_at DESC');
     res.render('admin/manage-services', { title: 'CMS » Especialidades', services });
@@ -1072,7 +1072,7 @@ app.post('/admin/servicos/delete/:id', async (req, res) => {
         res.redirect('/admin/servicos?success=1');
     } catch (e) { res.redirect('/admin/servicos?error=1'); }
 });
-*/
+
 // app.get('/contato', (req, res) => res.render('contato', { title: 'Contato | Sua Empresa' }));
 app.get('/politica-de-privacidade', (req, res) => res.render('politica', { title: 'Política de Privacidade | Sua Empresa' }));
 app.get('/termos-e-condicoes', (req, res) => res.render('termos', { title: 'Termos e Condições | Sua Empresa' }));
