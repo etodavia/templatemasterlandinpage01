@@ -199,6 +199,14 @@ h1 em, h2 em, h3 em {
     margin-bottom: 3rem;
 }
 
+.hero-title-adjustable {
+    transform: translateY(var(--hero-title-offset-y, 0px));
+}
+
+.hero-button-adjustable {
+    transform: translateY(var(--hero-button-offset-y, 0px));
+}
+
 /* BOTÕES PILL */
 .btn-pill-large {
     background: white;
@@ -471,7 +479,7 @@ footer {
     justify-content: center;
     padding: 24px;
     background: rgba(10, 17, 40, 0.58);
-    z-index: 5000;
+    z-index: 10000;
 }
 
 .lgpd-modal.show {
@@ -563,6 +571,32 @@ footer {
     }
     .lgpd-tab.show {
         display: flex;
+        top: auto;
+        bottom: 185px;
+        right: 0;
+        min-height: 92px;
+        padding: 14px 8px;
+        border-radius: 14px 0 0 14px;
+        font-size: 0.72rem;
+        z-index: 3900;
+    }
+    .lgpd-modal {
+        align-items: flex-end;
+        padding: 20px 18px 105px;
+    }
+    .lgpd-modal-card {
+        width: 100%;
+        max-height: calc(100vh - 145px);
+        overflow-y: auto;
+        border-radius: 20px;
+        padding: 24px;
+    }
+    .lgpd-modal-actions {
+        flex-direction: column;
+    }
+    .lgpd-modal-actions .lgpd-btn,
+    .lgpd-secondary-btn {
+        width: 100%;
     }
 
     /* NAVEGAÇÃO MOBILE/TABLET HUD */

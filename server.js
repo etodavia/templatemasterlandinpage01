@@ -277,6 +277,7 @@ async function setupDB() {
             'about_story_image VARCHAR(255)', 'social_links TEXT', 'about_story_lead TEXT', 'about_guidelines_title VARCHAR(255)', 'about_guidelines_text TEXT',
             'benefits_items TEXT', 'benefits_template VARCHAR(50)', 'benefits_color VARCHAR(50)', 'benefits_card_title_color VARCHAR(50)', 'benefits_card_text_color VARCHAR(50)', 'benefits_card_bg VARCHAR(50)',
             'hero_overlay_color VARCHAR(50) DEFAULT "#0A1128"', 'hero_overlay_opacity DECIMAL(3,2) DEFAULT 0.40',
+            'hero_title_offset_y INT DEFAULT 0', 'hero_button_offset_y INT DEFAULT 0',
             'contact_section_title VARCHAR(255)', 'contact_section_subtitle TEXT',
             'contact_phone VARCHAR(50)', 'contact_email VARCHAR(255)', 'address_full TEXT', 'contact_map_url TEXT',
             'contact_form_title VARCHAR(255)', 'contact_form_recipient VARCHAR(255)',
@@ -522,6 +523,14 @@ app.locals.assetVersion = ASSET_VERSION;
 // EJS Config
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads'), {
+    maxAge: 0,
+    etag: false,
+    lastModified: true,
+    setHeaders: (res) => {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    }
+}));
 app.use(express.static(path.join(__dirname, 'public'), {
     maxAge: process.env.NODE_ENV === 'production' ? '7d' : 0,
     etag: true,
@@ -861,7 +870,7 @@ app.post('/admin/conteudo', handleCmsUpload, async (req, res) => {
         'about_story_lead', 'about_guidelines_title', 'about_guidelines_text',
         'social_links', 'benefits_title', 'benefits_text', 'beneficios_json', 
         'hero_overlay_color',
-        'hero_overlay_opacity', 'contact_section_title', 'contact_section_subtitle', 'contact_phone', 'contact_email', 'address_full', 'contact_map_url',
+        'hero_overlay_opacity', 'hero_title_offset_y', 'hero_button_offset_y', 'contact_section_title', 'contact_section_subtitle', 'contact_phone', 'contact_email', 'address_full', 'contact_map_url',
         'contact_form_title', 'contact_form_recipient', 'license_qr_code', 'license_nf_data',
         'license_pdf', 'license_auth_code', 'admin_primary_color', 'admin_accent_color', 'admin_logo', 'admin_header_logo', 'contact_form_fields',
         'login_bg_color', 'login_card_bg', 'login_btn_bg', 'login_btn_text', 'login_label_email', 'login_label_password', 'login_title', 'login_logo',
@@ -938,6 +947,8 @@ app.post('/admin/conteudo', handleCmsUpload, async (req, res) => {
         'smtp_port',
         'show_topbar',
         'hero_overlay_opacity',
+        'hero_title_offset_y',
+        'hero_button_offset_y',
         'title_size_hero_desktop', 'title_size_hero_tablet', 'title_size_hero_mobile',
         'title_size_page_desktop', 'title_size_page_tablet', 'title_size_page_mobile',
         'title_size_section_desktop', 'title_size_section_tablet', 'title_size_section_mobile',

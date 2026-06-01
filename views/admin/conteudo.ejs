@@ -499,6 +499,16 @@
                             <input type="number" name="hero_overlay_opacity" value="<%= settings.hero_overlay_opacity || 0.4 %>" step="0.05" min="0" max="1" style="padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; width: 100%;">
                         </div>
                         <div class="form-group">
+                            <label>Posição Vertical do Título (px)</label>
+                            <input type="number" name="hero_title_offset_y" value="<%= settings.hero_title_offset_y || 0 %>" step="5" min="-300" max="300" style="padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; width: 100%;">
+                            <p class="field-note"><i class="ri-arrow-up-down-line"></i> Valor negativo sobe o título. Valor positivo desce.</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Posição Vertical do Botão (px)</label>
+                            <input type="number" name="hero_button_offset_y" value="<%= settings.hero_button_offset_y || 0 %>" step="5" min="-300" max="300" style="padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; width: 100%;">
+                            <p class="field-note"><i class="ri-arrow-up-down-line"></i> Ajusta o botão separadamente do título.</p>
+                        </div>
+                        <div class="form-group">
                             <label>Título de Impacto</label>
                             <textarea name="home_hero_title" style="min-height: 90px;" placeholder="Lidere Negócios com <em>Confiança</em>."><%= settings.home_hero_title || '' %></textarea>
                             <p class="field-note"><i class="ri-information-line"></i> Use &lt;em&gt;texto&lt;/em&gt; para aplicar a fonte alternada.</p>

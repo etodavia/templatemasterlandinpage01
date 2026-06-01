@@ -13,9 +13,17 @@
             return `${r}, ${g}, ${b}`;
         }
         const overlayStyle = `linear-gradient(rgba(${hexToRgb(oColor)}, ${oOpacity}), rgba(${hexToRgb(oColor)}, ${oOpacity}))`;
-        const heroDesktop = settings.hero_image || "/img/hero_optimo.png";
-        const heroTablet = settings.hero_image_tablet || heroDesktop;
-        const heroMobile = settings.hero_image_mobile || heroTablet;
+        const normalizeHeroImage = (src) => {
+            const cleanSrc = String(src || '').trim().replace(/\\/g, '/');
+            if (!cleanSrc) return '';
+            const separator = cleanSrc.includes('?') ? '&' : '?';
+            return `${cleanSrc}${separator}v=${Date.now()}`;
+        };
+        const heroDesktop = normalizeHeroImage(settings.hero_image || "/img/hero_optimo.png");
+        const heroTablet = normalizeHeroImage(settings.hero_image_tablet || settings.hero_image || "/img/hero_optimo.png");
+        const heroMobile = normalizeHeroImage(settings.hero_image_mobile || settings.hero_image_tablet || settings.hero_image || "/img/hero_optimo.png");
+        const heroTitleOffsetY = Number(settings.hero_title_offset_y || 0);
+        const heroButtonOffsetY = Number(settings.hero_button_offset_y || 0);
         const heroText = (value, fallback) => (value === null || typeof value === 'undefined') ? fallback : String(value);
         const homeHeroTitle = heroText(settings.home_hero_title, 'Lidere Negócios com <em>Confiança</em>.');
         const homeHeroDescription = heroText(settings.home_hero_description, 'Consultoria estratégica especializada em impulsionar o capital humano e elevar a performance operacional.');
@@ -37,10 +45,10 @@
 
     <main>
         <!-- HERO IMPACTO -->
-        <section id="home" class="hero responsive-bg" style="--responsive-bg-desktop: <%= overlayStyle %>, url('<%= heroDesktop %>'); --responsive-bg-tablet: <%= overlayStyle %>, url('<%= heroTablet %>'); --responsive-bg-mobile: <%= overlayStyle %>, url('<%= heroMobile %>');">
+        <section id="home" class="hero responsive-bg" style="--responsive-bg-desktop: <%= overlayStyle %>, url('<%= heroDesktop %>'); --responsive-bg-tablet: <%= overlayStyle %>, url('<%= heroTablet %>'); --responsive-bg-mobile: <%= overlayStyle %>, url('<%= heroMobile %>'); --hero-title-offset-y: <%= heroTitleOffsetY %>px; --hero-button-offset-y: <%= heroButtonOffsetY %>px;">
             <div class="hero-content">
                 <% if (homeHeroTitle.trim()) { %>
-                    <h1 data-reveal>
+                    <h1 data-reveal class="hero-title-adjustable">
                         <%- homeHeroTitle %>
                     </h1>
                 <% } %>
@@ -50,7 +58,7 @@
                     </p>
                 <% } %>
                 <% if (homeHeroButtonText.trim()) { %>
-                <div data-reveal style="display: flex; justify-content: flex-start;">
+                <div data-reveal class="hero-button-adjustable" style="display: flex; justify-content: flex-start;">
                     <a href="https://wa.me/<%= settings.whatsapp %>" class="btn-pill-large btn-whatsapp-conversion" style="width: auto !important; min-width: 200px; padding: 18px 30px; <%= settings.color_hero_button ? 'background:'+settings.color_hero_button+'; color: white;' : '' %>">
                         <%= homeHeroButtonText %> 
                         <div class="icon-blue-circle" style="<%= settings.color_hero_button ? 'background: rgba(255,255,255,0.2);' : 'background: var(--accent-red);' %> color: white;"><i class="ri-arrow-right-up-line"></i></div>
