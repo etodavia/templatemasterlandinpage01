@@ -15,6 +15,10 @@
 <% 
     const fontTitleVal = settings.font_title || 'Playfair Display';
     const fontBodyVal = settings.font_body || 'Inter Tight';
+    function remVar(value, fallback) {
+        const parsed = parseFloat(value);
+        return Number.isFinite(parsed) && parsed > 0 ? parsed.toFixed(2) + 'rem' : fallback + 'rem';
+    }
     const fontsList = [];
     if (fontTitleVal) fontsList.push(`family=${fontTitleVal.replace(/ /g, '+')}:ital,wght@1,400;1,700`);
     if (fontBodyVal) fontsList.push(`family=${fontBodyVal.replace(/ /g, '+')}:wght@400;600;700;800`);
@@ -38,6 +42,10 @@
         /* Fontes Dinâmicas */
         --font-serif: '<%= fontTitleVal %>', serif;
         --font-main: '<%= fontBodyVal %>', sans-serif;
+        --title-hero-size: <%= remVar(settings.title_size_hero_desktop, 4) %>;
+        --title-page-size: <%= remVar(settings.title_size_page_desktop, 3.2) %>;
+        --title-section-size: <%= remVar(settings.title_size_section_desktop, 3) %>;
+        --title-card-size: <%= remVar(settings.title_size_card_desktop, 1.5) %>;
 
         /* Cores de Seções e Páginas */
         --bg-about: <%= settings.color_about_bg || settings.color_areia || '#F7F7F4' %>;
@@ -50,6 +58,24 @@
         margin: 0;
         padding: 0;
         font-family: var(--font-main);
+    }
+
+    @media (max-width: 1024px) {
+        :root {
+            --title-hero-size: <%= remVar(settings.title_size_hero_tablet, 3.1) %>;
+            --title-page-size: <%= remVar(settings.title_size_page_tablet, 2.8) %>;
+            --title-section-size: <%= remVar(settings.title_size_section_tablet, 2.5) %>;
+            --title-card-size: <%= remVar(settings.title_size_card_tablet, 1.35) %>;
+        }
+    }
+
+    @media (max-width: 640px) {
+        :root {
+            --title-hero-size: <%= remVar(settings.title_size_hero_mobile, 2.2) %>;
+            --title-page-size: <%= remVar(settings.title_size_page_mobile, 2.3) %>;
+            --title-section-size: <%= remVar(settings.title_size_section_mobile, 2.1) %>;
+            --title-card-size: <%= remVar(settings.title_size_card_mobile, 1.2) %>;
+        }
     }
 </style>
 <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">

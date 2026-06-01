@@ -244,6 +244,39 @@
                             </select>
                         </div>
                     </div>
+
+                    <div class="section-header" style="margin-top: 40px;"><h3>Tamanhos dos TÃ­tulos (Responsivo)</h3></div>
+                    <p class="field-note" style="margin-bottom: 20px;"><i class="ri-font-size"></i> Valores em rem. Ex: 4.0 equivale a um tÃ­tulo grande; 2.2 fica melhor no celular.</p>
+                    <div class="form-grid">
+                        <% 
+                            const titleSizeGroups = [
+                                { label: 'Hero Principal', key: 'hero', defaults: { desktop: 4, tablet: 3.1, mobile: 2.2 } },
+                                { label: 'Hero de PÃ¡ginas Internas', key: 'page', defaults: { desktop: 3.2, tablet: 2.8, mobile: 2.3 } },
+                                { label: 'TÃ­tulos de SeÃ§Ã£o', key: 'section', defaults: { desktop: 3, tablet: 2.5, mobile: 2.1 } },
+                                { label: 'TÃ­tulos de Cards/Blocos', key: 'card', defaults: { desktop: 1.5, tablet: 1.35, mobile: 1.2 } }
+                            ];
+                            const devices = [
+                                { label: 'Desktop', key: 'desktop' },
+                                { label: 'Tablet', key: 'tablet' },
+                                { label: 'Mobile', key: 'mobile' }
+                            ];
+                        %>
+                        <% titleSizeGroups.forEach(group => { %>
+                            <div class="form-group full" style="margin-top: 10px; padding: 18px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 18px;">
+                                <label style="margin-bottom: 14px; display: block;"><%= group.label %></label>
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;">
+                                    <% devices.forEach(device => { 
+                                        const fieldName = `title_size_${group.key}_${device.key}`;
+                                    %>
+                                        <div>
+                                            <span style="display: block; font-size: 0.68rem; font-weight: 900; color: #64748B; text-transform: uppercase; margin-bottom: 6px;"><%= device.label %></span>
+                                            <input type="number" name="<%= fieldName %>" value="<%= settings[fieldName] || group.defaults[device.key] %>" min="0.8" max="8" step="0.1" style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #CBD5E1; font-weight: 800;">
+                                        </div>
+                                    <% }) %>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
                 </div>
 
                 <!-- CABEÇALHO -->

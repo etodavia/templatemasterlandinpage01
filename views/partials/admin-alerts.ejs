@@ -1,14 +1,21 @@
 <% const urlParams = new URLSearchParams(typeof query !== 'undefined' ? query : (typeof window !== 'undefined' ? window.location.search : '')); %>
 <% if (urlParams.has('success') || locals.success) { %>
     <div class="admin-alert-success" style="background: #E8F5E9; color: #2E7D32; padding: 20px 30px; border-radius: 18px; margin-bottom: 30px; display: flex; align-items: center; gap: 12px; font-weight: 700; border: 1px solid #C8E6C9; animation: slideDown 0.5s ease-out;">
-        <i class="ri-checkbox-circle-fill" style="font-size: 1.4rem;"></i> 
-        <span><%= locals.successMessage || 'Alteração realizada com sucesso!' %></span>
+        <i class="ri-checkbox-circle-fill" style="font-size: 1.4rem;"></i>
+        <span><%= locals.successMessage || 'Alteracao realizada com sucesso!' %></span>
     </div>
-    <style>
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
 <% } %>
 
 <% if (urlParams.has('error') || locals.error) { %>
-    <!-- Erro ocultado a pedido do usuário -->
+    <div class="admin-alert-error" style="background: #FEF2F2; color: #B91C1C; padding: 20px 30px; border-radius: 18px; margin-bottom: 30px; display: flex; align-items: center; gap: 12px; font-weight: 700; border: 1px solid #FECACA; animation: slideDown 0.5s ease-out;">
+        <i class="ri-error-warning-fill" style="font-size: 1.4rem;"></i>
+        <span><%= locals.errorMessage || urlParams.get('message') || 'Nao foi possivel salvar. Verifique o arquivo enviado e tente novamente.' %></span>
+    </div>
 <% } %>
+
+<style>
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>

@@ -193,7 +193,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({
     storage,
-    limits: { fileSize: 8 * 1024 * 1024, files: 50 },
+    limits: { fileSize: 20 * 1024 * 1024, files: 50 },
     fileFilter: (req, file, cb) => {
         if (!ALLOWED_UPLOAD_MIMES.has(file.mimetype)) {
             return cb(new Error('Tipo de arquivo nao permitido.'));
@@ -201,6 +201,46 @@ const upload = multer({
         cb(null, true);
     }
 });
+
+const cmsUpload = upload.fields([
+    { name: 'hero_image_file', maxCount: 1 }, 
+    { name: 'hero_image_tablet_file', maxCount: 1 }, 
+    { name: 'hero_image_mobile_file', maxCount: 1 }, 
+    { name: 'about_image_file', maxCount: 1 },
+    { name: 'about_hero_image_file', maxCount: 1 },
+    { name: 'about_hero_image_tablet_file', maxCount: 1 },
+    { name: 'about_hero_image_mobile_file', maxCount: 1 },
+    { name: 'services_hero_image_file', maxCount: 1 },
+    { name: 'services_hero_image_tablet_file', maxCount: 1 },
+    { name: 'services_hero_image_mobile_file', maxCount: 1 },
+    { name: 'blog_hero_image_file', maxCount: 1 },
+    { name: 'blog_hero_image_tablet_file', maxCount: 1 },
+    { name: 'blog_hero_image_mobile_file', maxCount: 1 },
+    { name: 'contact_hero_image_file', maxCount: 1 },
+    { name: 'contact_hero_image_tablet_file', maxCount: 1 },
+    { name: 'contact_hero_image_mobile_file', maxCount: 1 },
+    { name: 'about_story_image_file', maxCount: 1 },
+    { name: 'logo_file', maxCount: 1 },
+    { name: 'logo_white_file', maxCount: 1 },
+    { name: 'favicon_file', maxCount: 1 },
+    { name: 'license_qr_code_file', maxCount: 1 },
+    { name: 'license_pdf_file', maxCount: 1 },
+    { name: 'admin_logo_file', maxCount: 1 },
+    { name: 'admin_header_logo_file', maxCount: 1 },
+    { name: 'login_logo_file', maxCount: 1 },
+    { name: 'admin_tutorial_image_file', maxCount: 1 }
+]);
+
+function handleCmsUpload(req, res, next) {
+    cmsUpload(req, res, (err) => {
+        if (!err) return next();
+        console.error('CMS UPLOAD ERROR:', err.message);
+        const params = new URLSearchParams({ error: '1', message: err.message });
+        const activeTab = getTabFromReferer(req);
+        if (activeTab) params.set('tab', activeTab);
+        return res.redirect(`/admin/conteudo?${params.toString()}`);
+    });
+}
 
 // Automação de Migração de Schema (Garantindo novos campos)
 async function setupDB() {
@@ -254,6 +294,10 @@ async function setupDB() {
             'meta_title_home VARCHAR(255)', 'meta_description_home TEXT', 'facebook_pixel TEXT', 'google_analytics TEXT',
             'license_expiry_date VARCHAR(50)', 'license_stripe_url VARCHAR(512)', 'license_stripe_payment_code VARCHAR(255)',
             'font_title VARCHAR(100) DEFAULT "Playfair Display"', 'font_body VARCHAR(100) DEFAULT "Inter Tight"',
+            'title_size_hero_desktop DECIMAL(4,2)', 'title_size_hero_tablet DECIMAL(4,2)', 'title_size_hero_mobile DECIMAL(4,2)',
+            'title_size_page_desktop DECIMAL(4,2)', 'title_size_page_tablet DECIMAL(4,2)', 'title_size_page_mobile DECIMAL(4,2)',
+            'title_size_section_desktop DECIMAL(4,2)', 'title_size_section_tablet DECIMAL(4,2)', 'title_size_section_mobile DECIMAL(4,2)',
+            'title_size_card_desktop DECIMAL(4,2)', 'title_size_card_tablet DECIMAL(4,2)', 'title_size_card_mobile DECIMAL(4,2)',
             'color_about_bg VARCHAR(20) DEFAULT "#F7F7F4"', 'color_blog_bg VARCHAR(20) DEFAULT "#0A1128"',
             'color_blog_text VARCHAR(20) DEFAULT "#FFFFFF"', 'color_contact_bg VARCHAR(20) DEFAULT "#F7F7F4"',
             'admin_tutorial_video VARCHAR(500)', 'admin_tutorial_image VARCHAR(500)'
@@ -784,6 +828,7 @@ app.get('/admin/conteudo', async (req, res) => {
             title: 'Editor Global (CMS)', 
             success: req.query.success,
             error: req.query.error,
+            errorMessage: req.query.message,
             activeTab: req.query.tab || '',
             settings,
             beneficios
@@ -793,34 +838,7 @@ app.get('/admin/conteudo', async (req, res) => {
         res.render('admin/conteudo', { title: 'Editor Global (CMS)', settings: {}, beneficios: [] });
     }
 });
-app.post('/admin/conteudo', upload.fields([
-    { name: 'hero_image_file', maxCount: 1 }, 
-    { name: 'hero_image_tablet_file', maxCount: 1 }, 
-    { name: 'hero_image_mobile_file', maxCount: 1 }, 
-    { name: 'about_image_file', maxCount: 1 },
-    { name: 'about_hero_image_file', maxCount: 1 },
-    { name: 'about_hero_image_tablet_file', maxCount: 1 },
-    { name: 'about_hero_image_mobile_file', maxCount: 1 },
-    { name: 'services_hero_image_file', maxCount: 1 },
-    { name: 'services_hero_image_tablet_file', maxCount: 1 },
-    { name: 'services_hero_image_mobile_file', maxCount: 1 },
-    { name: 'blog_hero_image_file', maxCount: 1 },
-    { name: 'blog_hero_image_tablet_file', maxCount: 1 },
-    { name: 'blog_hero_image_mobile_file', maxCount: 1 },
-    { name: 'contact_hero_image_file', maxCount: 1 },
-    { name: 'contact_hero_image_tablet_file', maxCount: 1 },
-    { name: 'contact_hero_image_mobile_file', maxCount: 1 },
-    { name: 'about_story_image_file', maxCount: 1 },
-    { name: 'logo_file', maxCount: 1 },
-    { name: 'logo_white_file', maxCount: 1 },
-    { name: 'favicon_file', maxCount: 1 },
-    { name: 'license_qr_code_file', maxCount: 1 },
-    { name: 'license_pdf_file', maxCount: 1 },
-    { name: 'admin_logo_file', maxCount: 1 },
-    { name: 'admin_header_logo_file', maxCount: 1 },
-    { name: 'login_logo_file', maxCount: 1 },
-    { name: 'admin_tutorial_image_file', maxCount: 1 }
-]), async (req, res) => {
+app.post('/admin/conteudo', handleCmsUpload, async (req, res) => {
     let updateData = { ...req.body };
     console.log('📥 REQ.BODY COMPLETO:', Object.keys(req.body));
     
@@ -850,7 +868,12 @@ app.post('/admin/conteudo', upload.fields([
         'login_bg_color', 'login_card_bg', 'login_btn_bg', 'login_btn_text', 'login_label_email', 'login_label_password', 'login_title', 'login_logo',
         'header_strip_text', 'meta_title_home', 'meta_description_home', 'meta_keywords', 'facebook_pixel', 'google_analytics', 'pinterest_pixel', 'linkedin_pixel', 'custom_head_code', 'custom_body_code',
         'license_expiry_date', 'license_stripe_url', 'license_stripe_payment_code', 'template_version',
-        'font_title', 'font_body', 'color_hero_button', 'color_about_bg', 'color_blog_bg', 'color_blog_text', 'color_contact_bg',
+        'font_title', 'font_body',
+        'title_size_hero_desktop', 'title_size_hero_tablet', 'title_size_hero_mobile',
+        'title_size_page_desktop', 'title_size_page_tablet', 'title_size_page_mobile',
+        'title_size_section_desktop', 'title_size_section_tablet', 'title_size_section_mobile',
+        'title_size_card_desktop', 'title_size_card_tablet', 'title_size_card_mobile',
+        'color_hero_button', 'color_about_bg', 'color_blog_bg', 'color_blog_text', 'color_contact_bg',
         'benefits_color', 'benefits_text_color', 'benefits_title_color', 'benefits_icon_bg', 'benefits_icon_color', 'benefits_card_title_color', 'benefits_card_text_color', 'benefits_card_bg',
         'admin_tutorial_video', 'admin_tutorial_image'
     ];
