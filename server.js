@@ -263,7 +263,7 @@ async function setupDB() {
             'email_reply_contact TEXT', 'email_reply_newsletter TEXT', 'email_subject_contact VARCHAR(255)', 'email_subject_newsletter VARCHAR(255)',
             'site_name VARCHAR(100)', 'footer_text TEXT', 'home_hero_title TEXT', 'home_hero_description TEXT', 'services_hero_title TEXT',
             'instagram_url VARCHAR(255)', 'linkedin_url VARCHAR(255)', 'facebook_url VARCHAR(255)', 'nav_cta_text VARCHAR(100)', 'endereco TEXT', 'whatsapp VARCHAR(50)',
-            'color_marinho VARCHAR(20) DEFAULT "#0A1128"', 'color_areia VARCHAR(20) DEFAULT "#F7F7F4"', 'color_vermelho VARCHAR(20) DEFAULT "#D62828"', 'color_texto VARCHAR(20) DEFAULT "#333333"',
+            'color_marinho VARCHAR(20) DEFAULT "#0A1128"', 'color_areia VARCHAR(20) DEFAULT "#F7F7F4"', 'color_vermelho VARCHAR(20) DEFAULT "#D62828"', 'color_hero_button VARCHAR(50)', 'color_texto VARCHAR(20) DEFAULT "#333333"',
             'color_header VARCHAR(20) DEFAULT "#FFFFFF"', 'color_footer VARCHAR(20) DEFAULT "#0A1128"',
             'color_header_text VARCHAR(20) DEFAULT "#FFFFFF"', 'color_footer_text VARCHAR(20) DEFAULT "#FFFFFF"',
             'hero_image VARCHAR(255)', 'hero_image_tablet TEXT', 'hero_image_mobile TEXT', 'about_title VARCHAR(255)', 'about_text TEXT', 'about_image VARCHAR(255)', 'benefits_title VARCHAR(255)', 'benefits_text TEXT',
@@ -927,6 +927,13 @@ app.post('/admin/conteudo', handleCmsUpload, async (req, res) => {
     }
 
     // 2. FILTRAGEM E UPDATE DAS CONFIGURAÇÕES GLOBAIS
+    let existingConfigColumns = new Set(validColumns);
+    try {
+        const [configColumns] = await pool.execute('SHOW COLUMNS FROM configuracoes_globais');
+        existingConfigColumns = new Set(configColumns.map(col => col.Field));
+    } catch (err) {
+        console.error('Erro ao ler colunas de configuracoes_globais:', err.message);
+    }
     const filteredData = {};
     const numericColumns = new Set([
         'smtp_port',
@@ -939,7 +946,7 @@ app.post('/admin/conteudo', handleCmsUpload, async (req, res) => {
     ]);
     validColumns.forEach(key => {
         // Ignoramos beneficios_json que já foi tratado, e só pegamos o que existe no updateData
-        if (key !== 'beneficios_json' && updateData[key] !== undefined) {
+        if (key !== 'beneficios_json' && updateData[key] !== undefined && existingConfigColumns.has(key)) {
             let val = updateData[key];
             if (Array.isArray(val)) {
                 val = val[0];
