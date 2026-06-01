@@ -273,7 +273,7 @@ async function setupDB() {
             'services_section_title VARCHAR(255)', 'services_section_text TEXT', 'blog_section_title VARCHAR(255)', 'blog_section_text TEXT', 'testimonial_section_title VARCHAR(255)', 'newsletter_section_title VARCHAR(255)', 'newsletter_section_text TEXT',
             'services_page_description TEXT', 'blog_page_newsletter_title VARCHAR(255)', 'blog_page_newsletter_text TEXT', 'contact_page_description TEXT',
             'site_menu TEXT',
-            'home_hero_card_title VARCHAR(255)', 'home_hero_card_subtitle VARCHAR(255)', 'home_about_button_text VARCHAR(100)', 'home_services_button_text VARCHAR(100)',
+            'home_hero_card_title VARCHAR(255)', 'home_hero_card_subtitle VARCHAR(255)', 'home_hero_button_text VARCHAR(100)', 'home_about_button_text VARCHAR(100)', 'home_services_button_text VARCHAR(100)',
             'about_story_image VARCHAR(255)', 'social_links TEXT', 'about_story_lead TEXT', 'about_guidelines_title VARCHAR(255)', 'about_guidelines_text TEXT',
             'benefits_items TEXT', 'benefits_template VARCHAR(50)', 'benefits_color VARCHAR(50)', 'benefits_card_title_color VARCHAR(50)', 'benefits_card_text_color VARCHAR(50)', 'benefits_card_bg VARCHAR(50)',
             'hero_overlay_color VARCHAR(50) DEFAULT "#0A1128"', 'hero_overlay_opacity DECIMAL(3,2) DEFAULT 0.40',
