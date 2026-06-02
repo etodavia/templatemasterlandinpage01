@@ -229,6 +229,7 @@ const cmsUpload = upload.fields([
     { name: 'logo_file', maxCount: 1 },
     { name: 'logo_white_file', maxCount: 1 },
     { name: 'favicon_file', maxCount: 1 },
+    { name: 'seo_share_image_file', maxCount: 1 },
     { name: 'license_qr_code_file', maxCount: 1 },
     { name: 'license_pdf_file', maxCount: 1 },
     { name: 'admin_logo_file', maxCount: 1 },
@@ -301,7 +302,7 @@ async function setupDB() {
             'login_title VARCHAR(255) DEFAULT "Sistema CMS"', 'login_logo VARCHAR(255)',
             'contact_form_fields TEXT', 'header_strip_text TEXT', 'beneficios_json TEXT',
             'benefits_icon_bg VARCHAR(50)', 'benefits_icon_color VARCHAR(50)', 'benefits_title_color VARCHAR(50)', 'benefits_text_color VARCHAR(50)',
-            'meta_title_home VARCHAR(255)', 'meta_description_home TEXT', 'facebook_pixel TEXT', 'google_analytics TEXT',
+            'meta_title_home VARCHAR(255)', 'meta_description_home TEXT', 'seo_share_image TEXT', 'facebook_pixel TEXT', 'google_analytics TEXT',
             'license_expiry_date VARCHAR(50)', 'license_stripe_url VARCHAR(512)', 'license_stripe_payment_code VARCHAR(255)',
             'font_title VARCHAR(100) DEFAULT "Playfair Display"', 'font_body VARCHAR(100) DEFAULT "Inter Tight"',
             'title_size_hero_desktop DECIMAL(4,2)', 'title_size_hero_tablet DECIMAL(4,2)', 'title_size_hero_mobile DECIMAL(4,2)',
@@ -630,6 +631,16 @@ app.use(async (req, res, next) => {
             }
         }
         
+        const forwardedProto = (req.headers['x-forwarded-proto'] || '').split(',')[0].trim();
+        const protocol = forwardedProto || req.protocol || 'http';
+        const host = req.get('host');
+        res.locals.baseUrl = `${protocol}://${host}`;
+        res.locals.currentUrl = `${res.locals.baseUrl}${req.originalUrl}`;
+        res.locals.absoluteAssetUrl = (assetPath) => {
+            if (!assetPath) return '';
+            if (/^https?:\/\//i.test(assetPath)) return assetPath;
+            return `${res.locals.baseUrl}${assetPath.startsWith('/') ? assetPath : '/' + assetPath}`;
+        };
         res.locals.settings = settings;
         res.locals.licenseStatus = licenseStatus;
         res.locals.daysOverdue = daysOverdue;
@@ -878,7 +889,7 @@ app.post('/admin/conteudo', handleCmsUpload, async (req, res) => {
         'contact_form_title', 'contact_form_recipient', 'license_qr_code', 'license_nf_data',
         'license_pdf', 'license_auth_code', 'admin_primary_color', 'admin_accent_color', 'admin_logo', 'admin_header_logo', 'contact_form_fields',
         'login_bg_color', 'login_card_bg', 'login_btn_bg', 'login_btn_text', 'login_label_email', 'login_label_password', 'login_title', 'login_logo',
-        'header_strip_text', 'meta_title_home', 'meta_description_home', 'meta_keywords', 'facebook_pixel', 'google_analytics', 'pinterest_pixel', 'linkedin_pixel', 'custom_head_code', 'custom_body_code',
+        'header_strip_text', 'meta_title_home', 'meta_description_home', 'seo_share_image', 'meta_keywords', 'facebook_pixel', 'google_analytics', 'pinterest_pixel', 'linkedin_pixel', 'custom_head_code', 'custom_body_code',
         'license_expiry_date', 'license_stripe_url', 'license_stripe_payment_code', 'template_version',
         'font_title', 'font_body',
         'title_size_hero_desktop', 'title_size_hero_tablet', 'title_size_hero_mobile',
@@ -899,7 +910,7 @@ app.post('/admin/conteudo', handleCmsUpload, async (req, res) => {
         'contact_hero_image', 'contact_hero_image_tablet', 'contact_hero_image_mobile',
         'privacy_hero_image', 'privacy_hero_image_tablet', 'privacy_hero_image_mobile',
         'terms_hero_image', 'terms_hero_image_tablet', 'terms_hero_image_mobile',
-        'about_story_image', 'logo', 'logo_white', 'favicon', 
+        'about_story_image', 'logo', 'logo_white', 'favicon', 'seo_share_image',
         'license_qr_code', 'license_pdf', 'admin_logo', 'admin_header_logo',
         'login_logo', 'admin_tutorial_image'
     ];

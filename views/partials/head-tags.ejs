@@ -1,16 +1,36 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<%
+    const metaTitle = title || settings.meta_title_home || settings.site_name || 'Site';
+    const metaDescription = locals.description || settings.meta_description_home || '';
+    const rawShareImage = locals.ogImage || settings.seo_share_image || settings.hero_image || settings.logo || settings.favicon || '/capashow1.png';
+    const shareImage = locals.absoluteAssetUrl ? locals.absoluteAssetUrl(rawShareImage) : rawShareImage;
+    const pageUrl = locals.currentUrl || '';
+%>
 <title><%= title %></title>
-<meta name="description" content="<%= locals.description || '' %>">
+<meta name="description" content="<%= metaDescription %>">
 <meta name="keywords" content="<%= locals.keywords || '' %>">
 <% if (settings.favicon) { %>
 <link rel="icon" type="image/x-icon" href="<%= settings.favicon %>">
 <% } %>
 
 <!-- SEO & Social Meta -->
-<meta property="og:title" content="<%= title %>">
-<meta property="og:description" content="<%= locals.description || '' %>">
+<meta property="og:title" content="<%= metaTitle %>">
+<meta property="og:description" content="<%= metaDescription %>">
 <meta property="og:type" content="website">
+<% if (pageUrl) { %><meta property="og:url" content="<%= pageUrl %>"><% } %>
+<meta property="og:site_name" content="<%= settings.site_name || metaTitle %>">
+<% if (shareImage) { %>
+<meta property="og:image" content="<%= shareImage %>">
+<meta property="og:image:secure_url" content="<%= shareImage %>">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="<%= metaTitle %>">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="<%= metaTitle %>">
+<meta name="twitter:description" content="<%= metaDescription %>">
+<meta name="twitter:image" content="<%= shareImage %>">
+<% } %>
 
 <% 
     const fontTitleVal = settings.font_title || 'Playfair Display';

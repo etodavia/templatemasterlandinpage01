@@ -54,7 +54,8 @@ CREATE TABLE IF NOT EXISTS configuracoes_globais (
     cnpj VARCHAR(20),
     endereco TEXT,
     meta_title_home VARCHAR(255),
-    meta_description_home TEXT
+    meta_description_home TEXT,
+    seo_share_image TEXT
 );
 
 -- Inserir Usuário Admin Padrão (Senha: Et.123654*)
