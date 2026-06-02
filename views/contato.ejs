@@ -11,7 +11,7 @@
         <!-- CABEÇALHO DINÂMICO -->
         <%- include('partials/page-hero', { 
             pageTitle: settings.contact_hero_title || 'Entre em <em>Contato</em>',
-            image: settings.contact_hero_image || '/img/hero_optimo.png',
+            image: settings.contact_hero_image || settings.hero_image,
             imageTablet: settings.contact_hero_image_tablet,
             imageMobile: settings.contact_hero_image_mobile
         }) %>

@@ -54,7 +54,7 @@
     <%- include('partials/header') %>
     <%- include('partials/page-hero', { 
         pageTitle: settings.blog_hero_title || 'Insights & <em>Estratégia</em>',
-        image: settings.blog_hero_image || '/img/hero_optimo.png',
+        image: settings.blog_hero_image || settings.hero_image,
         imageTablet: settings.blog_hero_image_tablet,
         imageMobile: settings.blog_hero_image_mobile
     }) %>

@@ -20,9 +20,9 @@
             const separator = cleanSrc.includes('?') ? '&' : '?';
             return `${cleanSrc}${separator}v=${Date.now()}`;
         };
-        const heroDesktop = normalizeHeroImage(settings.hero_image || "/img/hero_optimo.png");
-        const heroTablet = normalizeHeroImage(settings.hero_image_tablet || settings.hero_image || "/img/hero_optimo.png");
-        const heroMobile = normalizeHeroImage(settings.hero_image_mobile || settings.hero_image_tablet || settings.hero_image || "/img/hero_optimo.png");
+        const heroDesktop = normalizeHeroImage(settings.hero_image);
+        const heroTablet = normalizeHeroImage(settings.hero_image_tablet || settings.hero_image);
+        const heroMobile = normalizeHeroImage(settings.hero_image_mobile || settings.hero_image_tablet || settings.hero_image);
         const heroTitleOffsetY = Number(settings.hero_title_offset_y || 0);
         const heroButtonOffsetY = Number(settings.hero_button_offset_y || 0);
         const heroText = (value, fallback) => (value === null || typeof value === 'undefined') ? fallback : String(value);
@@ -46,12 +46,14 @@
 
     <main>
         <!-- HERO IMPACTO -->
-        <section id="home" class="hero" style="--responsive-bg-desktop: <%= overlayStyle %>, url('<%= heroDesktop %>'); --responsive-bg-tablet: <%= overlayStyle %>, url('<%= heroTablet %>'); --responsive-bg-mobile: <%= overlayStyle %>, url('<%= heroMobile %>'); --hero-title-offset-y: <%= heroTitleOffsetY %>px; --hero-button-offset-y: <%= heroButtonOffsetY %>px;">
-            <picture class="hero-media">
-                <source media="(max-width: 640px)" srcset="<%= heroMobile %>">
-                <source media="(max-width: 1024px)" srcset="<%= heroTablet %>">
-                <img src="<%= heroDesktop %>" alt="" aria-hidden="true" loading="eager" decoding="sync" fetchpriority="high">
-            </picture>
+        <section id="home" class="hero" style="background: var(--navy-blue) !important; background-image: none !important; --responsive-bg-desktop: <%= overlayStyle %>, url('<%= heroDesktop %>'); --responsive-bg-tablet: <%= overlayStyle %>, url('<%= heroTablet %>'); --responsive-bg-mobile: <%= overlayStyle %>, url('<%= heroMobile %>'); --hero-title-offset-y: <%= heroTitleOffsetY %>px; --hero-button-offset-y: <%= heroButtonOffsetY %>px;">
+            <% if (heroDesktop) { %>
+                <picture class="hero-media">
+                    <source media="(max-width: 640px)" srcset="<%= heroMobile || heroDesktop %>">
+                    <source media="(max-width: 1024px)" srcset="<%= heroTablet || heroDesktop %>">
+                    <img src="<%= heroDesktop %>" alt="" aria-hidden="true" loading="eager" decoding="sync" fetchpriority="high">
+                </picture>
+            <% } %>
             <div class="hero-overlay" style="background: rgba(<%= overlayRgb %>, <%= oOpacity %>);"></div>
             <div class="hero-content">
                 <% if (homeHeroTitle.trim()) { %>

@@ -87,7 +87,7 @@
         <!-- CABEÇALHO DINÂMICO -->
         <%- include('partials/page-hero', { 
             pageTitle: settings.services_hero_title || 'Expertise <em>Estratégica.</em>',
-            image: settings.services_hero_image || '/img/hero_optimo.png',
+            image: settings.services_hero_image || settings.hero_image,
             imageTablet: settings.services_hero_image_tablet,
             imageMobile: settings.services_hero_image_mobile
         }) %>

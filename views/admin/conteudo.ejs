@@ -476,12 +476,18 @@
                             <input type="file" name="hero_image_file" accept="image/*">
                             <input type="hidden" name="hero_image" value="<%= settings.hero_image %>">
                             <% if (settings.hero_image) { %> <img src="<%= settings.hero_image %>" class="img-preview"> <% } %>
+                            <label style="display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 0.8rem; color: #ef4444; font-weight: 800;">
+                                <input type="checkbox" name="hero_image_remove" value="1"> Remover imagem atual
+                            </label>
                         </div>
                         <div class="form-group">
                             <label>Imagem de Fundo - Tablet (1200x900px opcional)</label>
                             <input type="file" name="hero_image_tablet_file" accept="image/*">
                             <input type="hidden" name="hero_image_tablet" value="<%= settings.hero_image_tablet %>">
                             <% if (settings.hero_image_tablet) { %> <img src="<%= settings.hero_image_tablet %>" class="img-preview"> <% } %>
+                            <label style="display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 0.8rem; color: #ef4444; font-weight: 800;">
+                                <input type="checkbox" name="hero_image_tablet_remove" value="1"> Remover imagem atual
+                            </label>
                             <p class="field-note"><i class="ri-tablet-line"></i> Se ficar vazio, usa a imagem de desktop.</p>
                         </div>
                         <div class="form-group">
@@ -489,6 +495,9 @@
                             <input type="file" name="hero_image_mobile_file" accept="image/*">
                             <input type="hidden" name="hero_image_mobile" value="<%= settings.hero_image_mobile %>">
                             <% if (settings.hero_image_mobile) { %> <img src="<%= settings.hero_image_mobile %>" class="img-preview"> <% } %>
+                            <label style="display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 0.8rem; color: #ef4444; font-weight: 800;">
+                                <input type="checkbox" name="hero_image_mobile_remove" value="1"> Remover imagem atual
+                            </label>
                             <p class="field-note"><i class="ri-smartphone-line"></i> Ideal para corte vertical no celular.</p>
                         </div>
                         <div class="form-group">
