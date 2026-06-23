@@ -145,8 +145,10 @@
     <%- include('partials/footer') %>
 
     <script>
-        gsap.registerPlugin(ScrollTrigger);
-        gsap.utils.toArray("[data-reveal]").forEach(el => {
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.gsap && window.ScrollTrigger) {
+            gsap.registerPlugin(ScrollTrigger);
+            gsap.utils.toArray("[data-reveal]").forEach(el => {
             let config = {
                 scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "play none none none" },
                 opacity: 0, duration: 1.4, ease: "power4.out"
@@ -156,7 +158,8 @@
             else if (direction === 'right') config.x = 80;
             else config.y = 50;
             gsap.from(el, config);
-        });
+            });
+        }
 
         // Lógica de Envio do Formulário de Contato
         const contactForm = document.getElementById('contact-form');
@@ -224,6 +227,7 @@
                 }
             });
         }
+    });
     </script>
 </body>
 </html>

@@ -42,6 +42,14 @@
         const homeHeroCardTitle = heroText(settings.home_hero_card_title, 'Sua empresa em <em>Crescimento</em>.');
         const homeHeroCardSubtitle = heroText(settings.home_hero_card_subtitle, 'Experiência Estratégica');
     %>
+    <% if (heroDesktop) { %>
+        <link rel="preload"
+              as="image"
+              href="<%= heroDesktop %>"
+              imagesrcset="<%= heroMobile || heroDesktop %> 640w, <%= heroTablet || heroDesktop %> 1024w, <%= heroDesktop %> 1600w"
+              imagesizes="100vw"
+              fetchpriority="high">
+    <% } %>
     <style>
         .hero { 
             height: 85vh; 
@@ -201,7 +209,7 @@
                     <!-- Navegação -->
                     <div class="swiper-button-next" style="color: var(--navy-blue); transform: translateX(20px);"></div>
                     <div class="swiper-button-prev" style="color: var(--navy-blue); transform: translateX(-20px);"></div>
-                    <div class="swiper-pagination"></div>
+                    <div class="swiper-pagination beneficios-pagination"></div>
                 </div>
             </div>
         </section>
@@ -252,6 +260,7 @@
                                             <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 18px;">
                                                 <img src="<%= t.foto || 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?auto=format&fit=crop&q=80&w=100' %>"
                                                      alt="Foto de <%= t.nome || 'cliente' %>" loading="lazy" decoding="async"
+                                                     onerror="this.onerror=null;this.src='/img/placeholder-user.svg';"
                                                      style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;">
                                                 <div>
                                                     <div style="font-weight: 800; color: var(--navy-blue); font-size: 0.95rem;"><%= t.nome %></div>
@@ -289,7 +298,7 @@
                         <% } %>
                     </div>
                     <!-- Paginação Customizada -->
-                    <div class="swiper-pagination" style="position: relative; margin-top: 40px;"></div>
+                    <div class="swiper-pagination testimonials-pagination" style="position: relative; margin-top: 40px;"></div>
                 </div>
             </div>
         </section>
@@ -358,8 +367,10 @@
 
     <!-- Scripts: GSAP + Swiper -->
     <script>
-        gsap.registerPlugin(ScrollTrigger);
-        gsap.utils.toArray("[data-reveal]").forEach(el => {
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.gsap && window.ScrollTrigger) {
+            gsap.registerPlugin(ScrollTrigger);
+            gsap.utils.toArray("[data-reveal]").forEach(el => {
             let config = {
                 scrollTrigger: { trigger: el, start: "top 90%", toggleActions: "play none none none" },
                 opacity: 0, duration: 1.4, ease: "power4.out"
@@ -369,31 +380,23 @@
             else if (direction === 'right') config.x = 60;
             else config.y = 40;
             gsap.from(el, config);
-        });
+            });
+        }
+
+        if (!window.Swiper) return;
 
         // Testimonials Swiper
+        const testimonialSlides = document.querySelectorAll('.testimonialsSwiper .swiper-slide').length;
         const swiper = new Swiper('.testimonialsSwiper', {
             slidesPerView: 1,
             spaceBetween: 25,
             grabCursor: true,
-            pagination: { el: ".swiper-pagination", clickable: true },
+            loop: testimonialSlides > 4,
+            pagination: { el: ".testimonials-pagination", clickable: true },
             breakpoints: {
                 768: { slidesPerView: 2 },
                 1024: { slidesPerView: 3 },
                 1280: { slidesPerView: 4 }
-            }
-        });
-
-        // Benefits Swiper
-        const benefitsSwiper = new Swiper('.benefitsSwiper', {
-            slidesPerView: 1.2,
-            spaceBetween: 20,
-            centeredSlides: true,
-            loop: true,
-            pagination: { el: ".beneficios-pagination", clickable: true },
-            breakpoints: {
-                768: { slidesPerView: 2.2, centeredSlides: false },
-                1024: { enabled: false } // Desativar carrossel no desktop (usar grid)
             }
         });
 
@@ -414,12 +417,13 @@
 
         // Lógica Newsletter
         // Carrossel de Benefícios
+        const beneficiosSlides = document.querySelectorAll('.beneficiosSwiper .swiper-slide').length;
         new Swiper(".beneficiosSwiper", {
             slidesPerView: 1,
             spaceBetween: 20,
-            loop: true,
+            loop: beneficiosSlides > 4,
             autoplay: { delay: 4000, disableOnInteraction: false },
-            pagination: { el: ".swiper-pagination", clickable: true },
+            pagination: { el: ".beneficios-pagination", clickable: true },
             navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
             breakpoints: {
                 640: { slidesPerView: 1.5 },
@@ -430,6 +434,7 @@
         });
 
 
+    });
     </script>
 </body>
 </html>

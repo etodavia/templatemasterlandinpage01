@@ -119,6 +119,8 @@
     <%- include('partials/footer') %>
 
     <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (!window.gsap || !window.ScrollTrigger) return;
         gsap.registerPlugin(ScrollTrigger);
         gsap.utils.toArray("[data-reveal]").forEach(el => {
             let config = {
@@ -131,6 +133,7 @@
             else config.y = 40;
             gsap.from(el, config);
         });
+    });
     </script>
 </body>
 </html>

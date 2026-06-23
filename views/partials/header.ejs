@@ -122,8 +122,10 @@
 <!-- SCRIPT GSAP PARA EFEITO ROLLING -->
 <script>
     document.addEventListener("DOMContentLoaded", () => {
+        if (!window.gsap) return;
         gsap.utils.toArray(".menu-item-link").forEach(link => {
             const roll = link.querySelector(".roll-btn");
+            if (!roll) return;
             link.addEventListener("mouseenter", () => {
                 gsap.to(roll, { yPercent: -50, duration: 0.3, ease: "power2.out" });
             });

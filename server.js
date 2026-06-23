@@ -5,6 +5,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const helmet = require('helmet');
+const compression = require('compression');
 const dotenv = require('dotenv');
 const bcrypt = require('bcryptjs');
 
@@ -520,6 +521,7 @@ const app = express();
 
 // Security and Parsers
 app.use(helmet({ contentSecurityPolicy: false }));
+app.use(compression());
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 app.locals.assetVersion = ASSET_VERSION;
@@ -528,23 +530,26 @@ app.locals.assetVersion = ASSET_VERSION;
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.get('/img/hero_optimo.png', (req, res) => {
-    res.setHeader('Cache-Control', 'public, max-age=604800, stale-while-revalidate=86400');
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
     res.sendFile(path.join(__dirname, 'public', 'img', 'hero_optimo.png'));
 });
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads'), {
-    maxAge: process.env.NODE_ENV === 'production' ? '30d' : 0,
+    maxAge: '365d',
+    immutable: true,
     etag: true,
     lastModified: true,
     setHeaders: (res) => {
-        if (process.env.NODE_ENV === 'production') {
-            res.setHeader('Cache-Control', 'public, max-age=2592000, stale-while-revalidate=86400');
-        }
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
     }
 }));
 app.use(express.static(path.join(__dirname, 'public'), {
-    maxAge: process.env.NODE_ENV === 'production' ? '30d' : 0,
+    maxAge: '365d',
+    immutable: true,
     etag: true,
-    lastModified: true
+    lastModified: true,
+    setHeaders: (res) => {
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    }
 }));
 app.get('/img/placeholder-user.png', (req, res) => res.redirect(301, '/img/placeholder-user.svg'));
 app.get('/img/placeholder-post.png', (req, res) => res.redirect(301, '/img/placeholder-post.svg'));
